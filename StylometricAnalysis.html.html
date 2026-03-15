@@ -1,0 +1,1170 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>文风测试 · Writing DNA</title>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Noto+Serif+SC:wght@300;400;500&family=Space+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+:root{--black:#0a0a0a;--white:#f5f4f0;--g100:#e8e7e3;--g200:#c8c7c2;--g400:#888680;--g600:#4a4946;--serif:'EB Garamond','Noto Serif SC',Georgia,serif;--mono:'Space Mono',monospace}
+*{margin:0;padding:0;box-sizing:border-box}
+html{font-size:16px;scroll-behavior:smooth}
+body{background:var(--white);color:var(--black);font-family:var(--serif);min-height:100vh;overflow-x:hidden}
+
+#cover{min-height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:4rem 2rem;border-bottom:1px solid var(--g200)}
+.cover-rule{width:1px;height:80px;background:var(--g400);margin-bottom:3rem;animation:growLine 1.2s ease forwards}
+@keyframes growLine{from{height:0;opacity:0}to{height:80px;opacity:1}}
+.cover-eyebrow{font-family:var(--mono);font-size:.65rem;letter-spacing:.25em;text-transform:uppercase;color:var(--g400);margin-bottom:2rem;opacity:0;animation:fadeUp .8s .4s ease forwards}
+.cover-title{font-size:clamp(3rem,8vw,6rem);font-weight:400;letter-spacing:-.02em;text-align:center;line-height:1.05;opacity:0;animation:fadeUp .8s .6s ease forwards}
+.cover-title em{font-style:italic;color:var(--g600)}
+.cover-sub{margin-top:2rem;font-size:1rem;color:var(--g400);font-style:italic;text-align:center;max-width:440px;line-height:1.8;opacity:0;animation:fadeUp .8s .9s ease forwards}
+.cover-meta{margin-top:3rem;font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;color:var(--g400);opacity:0;animation:fadeUp .8s 1.1s ease forwards}
+.btn-start{margin-top:4rem;padding:1rem 3rem;background:var(--black);color:var(--white);border:none;font-family:var(--serif);font-size:1rem;letter-spacing:.05em;cursor:pointer;transition:all .3s;opacity:0;animation:fadeUp .8s 1.3s ease forwards}
+.btn-start:hover{background:var(--g600)}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+
+.quiz-header{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(245,244,240,.96);backdrop-filter:blur(8px);border-bottom:1px solid var(--g100);padding:1rem 2rem;display:flex;justify-content:space-between;align-items:center}
+.qh-title{font-family:var(--mono);font-size:.65rem;letter-spacing:.2em;text-transform:uppercase;color:var(--g400)}
+.progress-wrap{display:flex;align-items:center;gap:1rem}
+.progress-text{font-family:var(--mono);font-size:.65rem;color:var(--g400);min-width:60px;text-align:right}
+.progress-bar{width:120px;height:1px;background:var(--g100);position:relative}
+.progress-fill{position:absolute;top:0;left:0;height:100%;background:var(--black);transition:width .5s ease}
+
+#quiz-shell{display:none;min-height:100vh;padding-top:56px}
+.section-marker{display:flex;align-items:center;gap:2rem;padding:5rem 4rem 2.5rem;max-width:860px;margin:0 auto}
+.sec-num{font-family:var(--mono);font-size:4rem;color:var(--g100);line-height:1;flex-shrink:0}
+.sec-info h2{font-size:1.5rem;font-weight:400;margin-bottom:.4rem}
+.sec-info p{font-style:italic;color:var(--g400);font-size:.9rem;line-height:1.6}
+.question-block{max-width:860px;margin:0 auto;padding:2.5rem 4rem;border-top:1px solid var(--g100);opacity:0;transform:translateY(20px);transition:opacity .45s,transform .45s}
+.question-block.visible{opacity:1;transform:translateY(0)}
+.q-num{font-family:var(--mono);font-size:.6rem;letter-spacing:.2em;color:var(--g400);margin-bottom:1.2rem}
+.q-text{font-size:1.15rem;line-height:1.75;margin-bottom:2rem;max-width:600px}
+.options-grid{display:grid;gap:.75rem}
+.option-label{display:flex;align-items:center;gap:1rem;padding:1rem 1.2rem;border:1px solid var(--g100);cursor:pointer;transition:all .2s}
+.option-label:hover{border-color:var(--g400);background:rgba(0,0,0,.02)}
+.option-label.selected{border-color:var(--black);background:var(--black);color:var(--white)}
+.option-label input{display:none}
+.opt-key{font-family:var(--mono);font-size:.65rem;flex-shrink:0;width:1.4rem;text-align:center;color:var(--g400);transition:color .2s;align-self:flex-start;padding-top:.25rem}
+.option-label.selected .opt-key{color:var(--g200)}
+.opt-text{font-size:.95rem;line-height:1.6}
+.scale-wrap{display:flex;flex-direction:column;gap:1rem}
+.scale-labels{display:flex;justify-content:space-between;font-style:italic;font-size:.85rem;color:var(--g400)}
+.scale-options{display:flex;gap:.5rem}
+.scale-btn{flex:1;height:44px;border:1px solid var(--g100);cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:.75rem;color:var(--g400);transition:all .2s;background:none}
+.scale-btn:hover{border-color:var(--g400)}
+.scale-btn.selected{background:var(--black);color:var(--white);border-color:var(--black)}
+.nav-row{max-width:860px;margin:0 auto;padding:2rem 4rem 6rem;display:flex;justify-content:space-between;align-items:center}
+.btn-nav{padding:.75rem 2rem;border:1px solid var(--g200);background:transparent;font-family:var(--serif);font-size:.9rem;cursor:pointer;transition:all .2s;color:var(--g600)}
+.btn-nav:hover{border-color:var(--black);color:var(--black)}
+.btn-nav.primary{background:var(--black);color:var(--white);border-color:var(--black)}
+.btn-nav.primary:hover{background:var(--g600);border-color:var(--g600)}
+.btn-nav:disabled{opacity:.2;cursor:default}
+
+#writing-section{display:none;padding:7rem 4rem 4rem;max-width:860px;margin:0 auto}
+.writing-eyebrow{font-family:var(--mono);font-size:.65rem;letter-spacing:.2em;text-transform:uppercase;color:var(--g400);margin-bottom:2rem}
+.writing-title{font-size:2rem;font-weight:400;line-height:1.3;margin-bottom:1rem}
+.writing-desc{font-style:italic;color:var(--g400);line-height:1.8;margin-bottom:.6rem;font-size:.95rem}
+.writing-tips{margin:1.5rem 0 2.5rem;padding:1.2rem 1.5rem;border-left:2px solid var(--g200)}
+.writing-tips p{font-size:.85rem;color:var(--g600);line-height:1.9;font-style:italic}
+.writing-area{width:100%;min-height:280px;border:1px solid var(--g200);padding:1.5rem;font-family:var(--serif);font-size:1rem;line-height:1.9;color:var(--black);background:transparent;resize:vertical;outline:none;transition:border-color .2s}
+.writing-area:focus{border-color:var(--black)}
+.writing-area::placeholder{color:var(--g200);font-style:italic}
+.word-counter{margin-top:.75rem;font-family:var(--mono);font-size:.6rem;letter-spacing:.15em;color:var(--g400);text-align:right}
+.word-counter.ok{color:var(--g600)}
+.btn-analyze{margin-top:3rem;padding:1.2rem 4rem;background:var(--black);color:var(--white);border:none;font-family:var(--serif);font-size:1rem;letter-spacing:.08em;cursor:pointer;transition:all .3s;display:block}
+.btn-analyze:hover:not(:disabled){background:var(--g600)}
+.btn-analyze:disabled{opacity:.3;cursor:default}
+
+#loading-screen{display:none;min-height:100vh;flex-direction:column;justify-content:center;align-items:center;gap:2rem}
+.loading-line{width:200px;height:1px;background:var(--g100);position:relative;overflow:hidden}
+.loading-fill{position:absolute;top:0;left:-100%;width:100%;height:100%;background:var(--black);animation:sweep 1.8s ease-in-out infinite}
+@keyframes sweep{0%{left:-100%}50%{left:0}100%{left:100%}}
+.loading-text{font-style:italic;color:var(--g400);font-size:.9rem}
+.loading-steps{font-family:var(--mono);font-size:.6rem;letter-spacing:.15em;color:var(--g200);text-align:center;line-height:2.2}
+.loading-steps span.active{color:var(--g600)}
+
+#result-screen{display:none;padding:7rem 2rem 6rem}
+.result-wrap{max-width:860px;margin:0 auto}
+.result-eyebrow{font-family:var(--mono);font-size:.6rem;letter-spacing:.25em;text-transform:uppercase;color:var(--g400);margin-bottom:3rem}
+.result-hero{border-bottom:1px solid var(--g200);padding-bottom:4rem;margin-bottom:4rem}
+.result-match-line{font-size:clamp(2rem,5vw,4rem);font-weight:400;line-height:1.1;letter-spacing:-.02em}
+.result-match-line em{font-style:italic;color:var(--g600)}
+.result-author-meta{margin-top:.8rem;font-family:var(--mono);font-size:.6rem;letter-spacing:.15em;color:var(--g400);text-transform:uppercase}
+.result-sim{margin-top:2rem;display:flex;align-items:center;gap:2rem}
+.sim-bar-outer{flex:1;height:1px;background:var(--g100);position:relative;max-width:300px}
+.sim-bar-inner{position:absolute;top:0;left:0;height:100%;background:var(--black);width:0;transition:width 1.5s .5s ease}
+.sim-pct{font-family:var(--mono);font-size:1.5rem;letter-spacing:-.02em}
+.sim-label{font-style:italic;font-size:.85rem;color:var(--g400)}
+.result-desc{margin-top:2rem;font-size:1.05rem;line-height:2;max-width:680px;color:var(--g600)}
+.sec-title{font-family:var(--mono);font-size:.6rem;letter-spacing:.25em;text-transform:uppercase;color:var(--g400);margin-bottom:2rem}
+.matches-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1px;background:var(--g100);margin-bottom:5rem}
+.match-card{background:var(--white);padding:2rem;transition:background .2s}
+.match-card:hover{background:var(--g100)}
+.match-name{font-size:1.05rem;margin-bottom:.2rem}
+.match-name-en{font-style:italic;font-size:.8rem;color:var(--g400);margin-bottom:.25rem}
+.match-era{font-family:var(--mono);font-size:.5rem;letter-spacing:.12em;color:var(--g400);text-transform:uppercase;margin-bottom:1rem}
+.match-pct{font-family:var(--mono);font-size:2rem;color:var(--g200);margin-bottom:.8rem}
+.match-trait{font-style:italic;font-size:.85rem;color:var(--g400);line-height:1.7}
+.traits-section{padding-top:4rem;border-top:1px solid var(--g100);margin-bottom:5rem}
+.trait-row{display:flex;align-items:flex-start;gap:2rem;margin-bottom:2.5rem;padding-bottom:2.5rem;border-bottom:1px solid var(--g100)}
+.trait-name{width:110px;flex-shrink:0;font-size:.85rem;color:var(--g600);padding-top:.4rem}
+.trait-right{flex:1}
+.trait-spectrum{position:relative;height:1px;background:var(--g100);margin-bottom:.8rem;margin-top:.4rem}
+.trait-dot{position:absolute;top:50%;transform:translate(-50%,-50%);width:8px;height:8px;background:var(--black);border-radius:50%;left:50%;transition:left 1.2s ease}
+.trait-ends{display:flex;justify-content:space-between;font-style:italic;font-size:.75rem;color:var(--g400)}
+.restart-area{padding-top:4rem;border-top:1px solid var(--g100);display:flex;align-items:center;gap:3rem;flex-wrap:wrap}
+.btn-restart{padding:1rem 3rem;background:transparent;border:1px solid var(--black);font-family:var(--serif);font-size:.95rem;cursor:pointer;transition:all .3s}
+.btn-restart:hover{background:var(--black);color:var(--white)}
+.restart-quote{font-style:italic;color:var(--g400);font-size:.9rem;line-height:1.7;max-width:360px}
+
+@media(max-width:640px){
+  .question-block,.section-marker,.nav-row{padding-left:1.5rem;padding-right:1.5rem}
+  #writing-section{padding:6rem 1.5rem 3rem}
+  .result-wrap{padding:0 1.5rem}
+  .trait-row{flex-direction:column;gap:1rem}
+  .trait-name{width:auto}
+  .matches-grid{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+
+<div id="cover">
+  <div class="cover-rule"></div>
+  <div class="cover-eyebrow">Writing DNA · 文风基因测试</div>
+  <h1 class="cover-title">你的文字<br><em>像谁</em></h1>
+  <p class="cover-sub">通过 30 道倾向题与一段自由写作，找到你在文学谱系中的坐标——从卡夫卡到张爱玲，从博尔赫斯到托尔斯泰。</p>
+  <div class="cover-meta">预计用时 12–18 分钟　·　两部分</div>
+  <button class="btn-start" onclick="startQuiz()">开始测试</button>
+</div>
+
+<div class="quiz-header" id="quiz-header" style="display:none">
+  <span class="qh-title">Writing DNA</span>
+  <div class="progress-wrap">
+    <span class="progress-text" id="progress-text">0 / 30</span>
+    <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+  </div>
+</div>
+
+<div id="quiz-shell">
+  <div id="questions-container"></div>
+  <div class="nav-row">
+    <button class="btn-nav" id="btn-prev" onclick="navigate(-1)" disabled>← 上一题</button>
+    <button class="btn-nav primary" id="btn-next" onclick="navigate(1)">下一题 →</button>
+  </div>
+</div>
+
+<div id="writing-section">
+  <div class="writing-eyebrow">第二部分 · Section II</div>
+  <h2 class="writing-title">现在，写一段属于你的文字</h2>
+  <p class="writing-desc">不限题材与形式。可以是一段独白、一个场景、一句开头、一封没寄出的信。</p>
+  <p class="writing-desc">它不需要完整，不需要精心打磨——只需要是你在此刻真实想说的。</p>
+  <div class="writing-tips">
+    <p>参考方向（任选其一，也可忽略）：<br>
+    · 某个你至今记得的气味或光线<br>
+    · 一次你说了「没关系」但其实不那么没关系的时刻<br>
+    · 你与某座城市，或某个人，或某件事物告别的方式</p>
+  </div>
+  <textarea class="writing-area" id="writing-input" placeholder="从这里开始……" oninput="updateWordCount()"></textarea>
+  <div class="word-counter" id="word-counter">0 字　·　建议 80 字以上以获得更准确的结果</div>
+  <button class="btn-analyze" id="btn-analyze" onclick="doAnalyze()" disabled>分析我的文风</button>
+</div>
+
+<div id="loading-screen">
+  <div class="loading-text">正在比对文学基因……</div>
+  <div class="loading-line"><div class="loading-fill"></div></div>
+  <div class="loading-steps" id="loading-steps">
+    <span class="active">解析表达倾向</span><br>
+    <span>构建特征向量</span><br>
+    <span>比对作家基因库</span><br>
+    <span>生成分析报告</span>
+  </div>
+</div>
+
+<div id="result-screen">
+  <div class="result-wrap">
+    <div class="result-eyebrow">Writing DNA · 你的文风报告</div>
+    <div class="result-hero">
+      <div class="result-match-line" id="r-name">—</div>
+      <div class="result-author-meta" id="r-meta">—</div>
+      <div class="result-sim">
+        <div class="sim-bar-outer"><div class="sim-bar-inner" id="sim-bar"></div></div>
+        <div><div class="sim-pct" id="sim-pct">—</div><div class="sim-label">相似度</div></div>
+      </div>
+      <p class="result-desc" id="r-desc">—</p>
+    </div>
+    <div class="sec-title" style="margin-bottom:2rem">其他相近的声音</div>
+    <div class="matches-grid" id="matches-grid"></div>
+    <div class="traits-section">
+      <div class="sec-title">文风特征光谱</div>
+      <div id="traits-display"></div>
+    </div>
+    <div class="restart-area">
+      <button class="btn-restart" onclick="restartQuiz()">重新测试</button>
+      <p class="restart-quote" id="r-quote">—</p>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── QUESTIONS ──────────────────────────────────────────────
+const QS=[
+{sec:1,sT:"语言直觉",sD:"你天然的写作本能——在还没想「应该怎么写」之前，笔已经去了哪里。",
+ t:"当你试图描述一种难以言说的情绪，你最先想到的是——",
+ o:["一个具体的物件或场景，让它替你开口","直接命名那种感受，哪怕词不够用","一个比喻或隐喻，把它变成别的东西","干脆什么都不说，用留白和沉默"],
+ s:[{imagery:2,subtext:1},{directness:2},{metaphor:2,poetic:1},{restraint:3,subtext:2}]},
+{sec:1,
+ t:"如果一段文字读起来让你感到「对，就是这个感觉」，它最可能是因为——",
+ o:["句子的节奏和停顿恰到好处","它说出了你以为自己说不出的东西","每个字都是精确的，没有多余","它带来了某种视觉或身体上的感知"],
+ s:[{rhythm:2},{intimate:2,psychological:1},{minimalism:2},{sensory:2,imagery:1}]},
+{sec:1,
+ t:"你更偏爱哪种开头方式？",
+ o:["直接切入核心事件或人物，不做铺垫","先给读者一个气氛、一种光线、一阵风","以一个问题或悖论开场","从一个细小的、看起来无关紧要的细节开始"],
+ s:[{directness:2,realism:1},{atmosphere:2,sensory:1},{philosophical:2,existential:1},{detail:2,imagery:1}]},
+{sec:1,
+ t:"下面哪种句式最接近你的本能输出？",
+ o:["短促、斩断，像一个确认","绵延铺展，拖着一串从句","克制，几乎像在故意省略什么","带着反问或自我拆解"],
+ s:[{minimalism:2,directness:1},{baroque:2},{restraint:3,subtext:1},{irony:2,analytical:1}]},
+{sec:1,
+ t:"你写作时，标点符号对你来说是——",
+ o:["呼吸和停顿，是节奏本身","意义的延伸，有时比词语更精确","麻烦，能省就省","情绪的刻度，用它来控制温度"],
+ s:[{rhythm:2,poetic:1},{minimalism:1,experimental:1},{directness:1,minimalism:1},{intimate:2,psychological:1}]},
+
+{sec:2,sT:"叙事取向",sD:"你倾向于如何组织故事、时间和人物的关系。",
+ t:"在你的写作里，时间通常是——",
+ o:["线性流动的，按照事件发生的顺序","断裂的，在闪回与当下之间跳跃","几乎停止的，像被某个瞬间凝固","循环的，不断回到同一个节点"],
+ s:[{realism:2},{fragmented:2,experimental:1},{atmosphere:1,poetic:2},{philosophical:1,existential:2}]},
+{sec:2,
+ t:"你在写人物时，最感兴趣的是——",
+ o:["他们做了什么，行动与事件","他们没有说出口的那些话","他们身处的社会结构和命运的重量","他们内心的悖论与自我欺骗"],
+ s:[{realism:2,directness:1},{subtext:2,restraint:1},{social:2},{psychological:2,analytical:1}]},
+{sec:2,
+ t:"你更倾向于哪种叙述视角？",
+ o:["第一人称，紧贴感受，不保持距离","第三人称，保留旁观者的冷静","第二人称，直接质问读者或自己","多重视角，同一事件多次折射"],
+ s:[{intimate:2,confessional:1},{analytical:2,realism:1},{irony:1,directness:2},{experimental:2,fragmented:1}]},
+{sec:2,
+ t:"故事对你来说，结局意味着——",
+ o:["一个解答，一种收束","一个新的问题浮出来","什么都没变，但一切已经不同","开放的沉默，留给读者去填"],
+ s:[{realism:1,directness:1},{philosophical:2,existential:1},{subtext:2,psychological:1},{restraint:2,experimental:1}]},
+{sec:2,
+ t:"你如何处理写作中的「空白」——那些没有直接写出来的部分？",
+ o:["尽量填满，不留误解的余地","有意留白，让读者参与完成","用暗示和侧写来替代直述","用结构本身来暗示缺席的内容"],
+ s:[{realism:2,directness:1},{restraint:2,subtext:2},{imagery:1,subtext:2,metaphor:1},{experimental:2,analytical:1}]},
+
+{sec:3,sT:"语言审美",sD:"你认为什么样的语言是美的——或者，什么样的文字是有力量的。",
+ t:"下面哪种文字风格最让你心动？",
+ o:["朴素、干净，像骨头一样，没有多余","繁复、精工，每个句子都是一座迷宫","口语化的，像说话，但比说话更准确","诗性的，散文与诗之间界限模糊"],
+ s:[{minimalism:3},{baroque:3,imagery:1},{directness:2,realism:1},{poetic:3,atmosphere:1}]},
+{sec:3,
+ t:"当你读到一个让你觉得「妒忌」的句子，它通常是因为——",
+ o:["它用最少的字说了最多的东西","它把常见的东西写成了陌生的奇迹","它的节奏让你忍不住想大声朗读","它直接击中了某个你一直以为无法命名的感受"],
+ s:[{minimalism:2,restraint:1},{defamiliarization:3,imagery:1},{rhythm:3,poetic:1},{psychological:2,intimate:1}]},
+{sec:3,
+ t:"对你来说，比喻是——",
+ o:["一种解释工具，让抽象变得可见","写作的核心——思想本身就是比喻构成的","一种偶尔为之的装饰","一种危险——用得不好会掩盖而非揭示真相"],
+ s:[{imagery:2,realism:1},{metaphor:3,poetic:1},{baroque:1},{minimalism:2,analytical:1}]},
+{sec:3,
+ t:"你对密集的文化与文学引用的态度是——",
+ o:["喜欢，这是文字有厚度的证明","谨慎，用得太多会把读者推开","几乎不用，要让语言对所有人开放","视情况，有时它是最精确的路径"],
+ s:[{baroque:2,philosophical:1},{restraint:1,analytical:1},{directness:2,minimalism:1},{experimental:1}]},
+{sec:3,
+ t:"你觉得「陌生化」——把熟悉事物写出奇异感——在你的写作中占多大比重？",
+ type:"scale",left:"几乎不用，更喜欢自然流畅",right:"大量使用，这是我写作的核心",
+ st:["defamiliarization","experimental"]},
+
+{sec:4,sT:"情感处理",sD:"你和写作对象之间的温度——贴近还是保持距离，克制还是直接。",
+ t:"当你写一段悲伤时，你的本能是——",
+ o:["直接写出悲伤本身，不加掩饰","写悲伤的外部表现：动作、物件、天气","压制它，只写它留下的空洞","用幽默或反讽来包裹它"],
+ s:[{confessional:2,intimate:1},{imagery:2,subtext:2},{restraint:3,subtext:1},{irony:2,analytical:1}]},
+{sec:4,
+ t:"你与写作对象（人物、事物、记忆）的关系通常是——",
+ o:["深情投入，几乎合为一体","保持某种审视的距离","爱恨交织，复杂但不试图解决","解剖式的，像在做标本"],
+ s:[{intimate:2,confessional:1},{analytical:2,realism:1},{psychological:2,irony:1},{analytical:3}]},
+{sec:4,
+ t:"你倾向于在写作中处理哪类情感？",
+ o:["强烈的——爱、恨、愤怒、绝望","微妙的——那些没有名字的轻微感受","集体性的——时代与社会的情绪","哲学性的——对存在本身的感受"],
+ s:[{confessional:2,intimate:1},{subtext:2,psychological:2},{social:2},{philosophical:2,existential:2}]},
+{sec:4,
+ t:"你觉得写作中的「克制」——",
+ type:"scale",left:"是一种损失，情感应当充分表达",right:"是一种力量，留白比爆发更有力",
+ st:["restraint","subtext"]},
+{sec:4,
+ t:"你在写作里使用幽默的方式——",
+ o:["很少，幽默会破坏认真的基调","常用，幽默是一种思维方式","作为保护层，包裹真正严肃的东西","作为武器，讽刺与批判"],
+ s:[{confessional:1,intimate:1},{playful:2},{irony:2,subtext:1},{irony:2,social:2}]},
+{sec:4,
+ t:"你在写爱的时候，更接近哪种方式？",
+ o:["直接说出「我爱你」或类似的情感宣言","用对方的一个动作或习惯来替代整段独白","绕过爱这个词，描述失去它之后的空缺","把它解构——爱是什么，它在哲学上意味着什么"],
+ s:[{confessional:2,directness:1},{imagery:2,subtext:2,restraint:1},{restraint:2,subtext:2},{philosophical:2,analytical:1}]},
+
+{sec:5,sT:"思想倾向",sD:"你的写作背后的世界观与关切——你在用文字问什么问题。",
+ t:"如果你的写作有一个核心关切，最接近的是——",
+ o:["个人的内心与记忆","人与他人的关系和权力结构","存在本身的荒诞与意义","语言与真实之间的鸿沟"],
+ s:[{intimate:2,confessional:2},{social:2,realism:1},{existential:2,philosophical:2},{experimental:2,defamiliarization:1}]},
+{sec:5,
+ t:"你认为文学应当——",
+ o:["记录和见证，为时代留下印记","追问和困惑，提出比答案更好的问题","创造体验，让人感受到自己活着","打破语言本身的边界"],
+ s:[{realism:2,social:1},{philosophical:2,existential:1},{sensory:2,poetic:1},{experimental:3,defamiliarization:1}]},
+{sec:5,
+ t:"你与「现实」的关系在写作中是——",
+ o:["紧密依附，细节和真实感是一切","有所变形，现实是材料而非目标","大幅扭曲，用超现实来揭示更深的真实","彻底重构，虚构比现实更真"],
+ s:[{realism:3,detail:1},{realism:1,imagery:1,metaphor:1},{surrealism:2,defamiliarization:2},{surrealism:3,experimental:2}]},
+{sec:5,
+ t:"你对「自我」在写作中的位置是——",
+ o:["自我是写作的唯一诚实来源","自我应当从写作中撤退，让世界发声","自我是被质疑和解构的对象","自我与他者的边界本就模糊"],
+ s:[{confessional:3,intimate:1},{analytical:2,realism:1},{irony:2,experimental:1},{psychological:2,poetic:1}]},
+{sec:5,
+ t:"你对「意义」在写作中的位置是——",
+ o:["意义是首要的，形式为其服务","意义在阅读中才产生，文本本身是开放的","形式本身就是意义","意义是可疑的，我更关心体验"],
+ s:[{directness:1,realism:1},{experimental:2,subtext:1},{experimental:2,baroque:1},{sensory:2,poetic:1}]},
+
+{sec:6,sT:"阅读影响",sD:"你读进去的东西，最终成为你写出来的东西。",
+ t:"在你最喜欢的作家里，他们的共同点最接近——",
+ o:["语言的精确与克制","叙事结构的复杂与创新","对人性的深刻洞察","世界观的独特与不妥协"],
+ s:[{minimalism:2,restraint:1},{experimental:2,baroque:1},{psychological:2,analytical:1},{existential:1,philosophical:1}]},
+{sec:6,
+ t:"你更容易被哪类文字「带走」——进入忘我的阅读状态？",
+ o:["流畅推进、有强情节张力的叙事","语言本身很美，哪怕没有情节","思想密度高，需要慢读细思","某种私密的、像在偷听别人独白的文字"],
+ s:[{realism:2,directness:1},{poetic:2,baroque:1},{philosophical:2,analytical:1},{intimate:2,confessional:1}]},
+{sec:6,
+ t:"写作对你来说，更像是——",
+ o:["一种发现，写着写着才知道自己要说什么","一种控制，预先知道结构和走向","一种倾诉，把胸口的东西移到纸上","一种游戏，看语言能走多远"],
+ s:[{fragmented:1,poetic:1},{analytical:2,realism:1},{confessional:2,intimate:1},{experimental:2,playful:1}]},
+{sec:6,
+ t:"你写作时，想象中的「读者」是——",
+ o:["不存在的，我只为自己写","一个陌生人，我要让他信任我","一个与我相像的人，能懂我的省略","某个具体的人，现实中存在的"],
+ s:[{confessional:2,intimate:1},{realism:1,directness:1},{subtext:2,intimate:2},{confessional:1,intimate:2}]},
+{sec:6,
+ t:"下面哪个描述最接近你读完一本好书的感受？",
+ o:["世界变得更清晰了，像扫去了一层灰","世界变得更复杂了，多了几个无解的问题","感觉被彻底理解了，或者被击穿了","感到一种难以解释的孤独，但是美好的那种"],
+ s:[{realism:1,directness:1},{philosophical:2,existential:1},{intimate:2,psychological:1},{poetic:2,atmosphere:1}]},
+];
+
+// ── WRITERS DATABASE (50) ────────────────────────────────────
+const WR=[
+// Chinese writers
+{n:"张爱玲",en:"Eileen Chang",era:"中国 · 20世纪",
+ q:`生命是一袭华美的袍，爬满了虱子。`,
+ d:`你的写作有张爱玲的双重性——华丽是外壳，冷酷是内核。她是中国现代文学里最会用物件说话的人：一件旗袍的花纹、一盏昏黄的灯、窗帘在风里的轻响，这些都不只是背景，而是情感本身的化身。你也倾向于让具体的东西替你开口，不直接命名情绪，而是让一个场景承担它。
+
+张爱玲的语言是冷的，但冷得有温度——她不是不懂得爱，而是太懂了，所以才写得那么准确，那么残忍。她笔下的女性在精心维系的华丽里慢慢腐朽，那种腐朽不是悲剧式的，而是日常的、细密的，像霉斑从墙角蔓延。你的写作有类似的气质：在最精致的表面之下，保持一种清醒的解剖距离。
+
+她说，生命是一袭华美的袍，爬满了虱子。这句话里有她整个世界观：美是真实的，丑也是真实的，两者同时存在，不互相消解。你的文风里有这种拒绝单一情感的复杂性——你不愿意只写「好」或只写「坏」，你更感兴趣的是它们如何在同一个时刻共存。
+
+她的句子有一种控制感，像被精心剪裁过，多一个字是臃肿，少一个字是残缺。这种对语言的精确要求，也体现在你答题时对「每个字都是精确的」的偏好上。你们都相信，语言的节制本身就是一种力量，克制的背后是更深的情感密度。`,
+ v:{imagery:3,sensory:2,baroque:2,analytical:2,psychological:2,restraint:1,irony:2,subtext:2,detail:2,intimate:2}},
+{n:"鲁迅",en:"Lu Xun",era:"中国 · 20世纪",
+ q:`横眉冷对千夫指，俯首甘为孺子牛。`,
+ d:`你的文字有鲁迅的骨——短促，精准，不妥协。他是中国现代文学里语言最干净的人之一，没有废话，没有装饰，每一个字都在做事。他的讽刺不是刻薄，而是外科医生式的精确：他看见了病，他命名了病，他不假装病不存在。
+
+鲁迅的幽默是最难学的那种——它是绝望磨出来的光泽。他写祥林嫂，写阿Q，写那些「沉默的大多数」，用的不是怜悯，而是一种更深的、更费力气的理解。他的冷静不是冷漠，而是一个清醒者在混沌里维持的最后一点自持。你的写作里有类似的气质：不愿意廉价地同情，也不愿意轻易地愤怒，更倾向于用精准的观察替代情绪的宣泄。
+
+他对语言的处理方式影响了整整一代人——短句、直接、有力。他不相信繁复和华丽，他相信击中。你答题时对「短促、斩断「句式的偏好，和对「直接命名感受「的选择，都指向这个方向：你也相信语言的直接性，你也对修辞的过剩保持警惕。
+
+鲁迅说，横眉冷对千夫指，俯首甘为孺子牛。这两行诗里有他的全部张力：对权力的不妥协，和对弱者的深情。你的写作也有这种内部的张力——表面的冷和内部的热，表面的讽和内部的爱。`,
+ v:{minimalism:3,irony:3,social:3,directness:2,restraint:2,analytical:2,realism:2}},
+{n:"沈从文",en:"Shen Congwen",era:"中国 · 20世纪",
+ q:`我只想造希腊小庙，供奉人性。`,
+ d:`你的写作里有沈从文的那种清澈——像湘西的水，透明而有力量，朴素而不贫乏。他是中国现代文学里最早发现「日常之诗意「的人之一：不需要戏剧性的事件，不需要宏大的主题，一个渡船老人、一个山里女孩的故事，在他笔下就有了整个宇宙的重量。
+
+沈从文相信细节的力量。他写水边的光线，写苗族妇女绣的花纹，写河滩上的石头——这些细节不是装饰，而是他理解世界的方式。你在答题时对「从一个细小的、看起来无关紧要的细节开始「的偏好，和他的写作本能高度吻合：你们都相信，最小的细节往往通向最大的真实。
+
+他的语言是朴素的，但朴素本身就是一种选择，一种对过度修辞的拒绝，一种对语言原始力量的信任。他不炫技，不用僻字难词，但他的每一个句子都有一种干净的精确，像被流水磨光的石头。你的写作倾向里有这种对「自然流畅「的偏好，和对语言工巧性的某种保留。
+
+他说，我只想造希腊小庙，供奉人性。这句话里有他最深的文学信仰：文学是容器，而不是内容本身；形式是为了盛住那些最基本的人的东西。你的写作也有这种「向内「的方向，更关心人心的纹理而不是社会结构的批判。`,
+ v:{poetic:2,realism:2,atmosphere:2,imagery:2,minimalism:1,intimate:2,detail:2,sensory:1}},
+{n:"余华",en:"Yu Hua",era:"中国 · 当代",
+ q:`活着，就是为了活着本身。`,
+ d:`你的文字有余华式的冷静——他用最平静的语气说最残酷的事情。《活着》里福贵一次次失去，《许三观卖血记》里的苦难绵延不断，但余华的语言始终是克制的，甚至是轻描淡写的。正是这种语气和内容之间的巨大落差，制造了最强烈的阅读冲击。
+
+余华是中国当代文学里把「克制「用得最好的作家之一。他不哭，不声嘶力竭，他只是陈述。那种陈述本身就是一种立场：承认苦难的存在，但不被苦难淹没；看见残酷，但不因残酷而失去对人的基本信任。你的写作倾向中对「克制是一种力量「的认同，和余华的写作哲学是相通的。
+
+他早期受到卡夫卡和卡佛的影响，学会了那种「脏现实主义「的朴素和直接。他的句子通常不长，节奏稳定，不追求文字上的华美，但偏偏因为这种朴素而更有穿透力。你对「朴素、干净「风格的偏好，以及对「用最少的字说最多的东西「的欣赏，都指向这个共同的美学方向。
+
+他说，活着，就是为了活着本身。这是最简单的话，也是最重的话。你的写作里也有这种对「基本真实「的执念——不试图解释太多，不试图升华太多，让事物就是它自己，让那个「就是「本身说话。`,
+ v:{minimalism:2,realism:2,directness:2,restraint:2,subtext:1,social:1,irony:1}},
+{n:"王小波",en:"Wang Xiaobo",era:"中国 · 20世纪",
+ q:`那一天我二十一岁，在我一生的黄金时代。`,
+ d:`你的文字有王小波的自由——那种属于真正意义上的自由人的写法，没有什么是不可以质疑的，没有什么是不可以嘲笑的，包括他自己。他用幽默对抗荒诞，用智识抵抗愚蠢，用小说里的黄金时代想象一种别处的可能性。
+
+王小波最独特的地方是他把幽默当作一种思维方式，而不只是一种修辞策略。他的幽默不是为了逗乐，而是一种对世界的严肃认识：世界就是荒诞的，那就把荒诞写成荒诞，用清醒的眼睛看，用笑声作回应。你在答题中对幽默的理解——把它作为保护层包裹严肃——和他的方式高度吻合。
+
+他的文体是独特的：自由散漫，又有内在的逻辑；看似漫不经心，但每一个转折都是精心计算的。他喜欢用第一人称，喜欢在叙事中插入议论，喜欢让人物说出超出情境期待的话。这种自我意识很强的叙事方式，和你对「带着反问或自我拆解「句式的偏好是相通的。
+
+他说，那一天我二十一岁，在我一生的黄金时代。这句话让无数人记住——不是因为它华丽，而是因为它准确地击中了某种关于青春和可能性的感受。你的写作也有这种能力：用一句话打开一个世界，用一个细节打开一段记忆。`,
+ v:{irony:2,playful:2,analytical:2,philosophical:1,experimental:1,directness:1,realism:1}},
+{n:"莫言",en:"Mo Yan",era:"中国 · 当代",
+ q:`高密东北乡的高粱地，是我的精神家园。`,
+ d:`你的写作有莫言式的过剩——感官的、历史的、魔幻的，所有东西都要比现实更多一点，更浓一点，更烫一点。他的高密东北乡是一个气味浓烈的地方：血腥的、泥土的、高粱酒的，这些气味本身就承载着整部中国近代史的重量。
+
+莫言从福克纳和马尔克斯那里学到了把地方性写成普遍性的方法：一个村庄就是整个世界，一个家族的兴衰就是整个民族命运的缩影。他用魔幻现实主义处理中国历史，不是因为他回避现实，而是因为中国近代的历史本身就是魔幻的，荒诞程度超出了任何单纯写实手法的承载能力。你对超现实手法的偏好，与他的这个判断是相通的。
+
+他的语言是繁复的，意象密集，色彩浓烈，充满了感官细节。他不克制，不收敛，他往里堆，往里加，一个比喻接着一个比喻，一个场景叠着另一个场景。这种巴洛克式的繁复不是炫耀，而是他理解世界的方式：世界本来就是这么多、这么乱、这么过剩的。
+
+他说，高密东北乡的高粱地，是我的精神家园。每个伟大的作家都需要一块属于自己的土地——不是地理意义上的，而是语言意义上的，那是他们可以无限返回、无限出发的地方。你的写作也在寻找这样一块土地。`,
+ v:{surrealism:2,baroque:2,sensory:2,social:2,realism:1,atmosphere:2,imagery:2,defamiliarization:1}},
+{n:"苏童",en:"Su Tong",era:"中国 · 当代",
+ q:`在那个潮湿的南方，一切都在腐烂与生长。`,
+ d:`你的文字有苏童的腐朽之美——那种潮湿的南方气息，旧院落里的女人们，潮湿、霉变、却散发出奇特的光。他把衰败写成美学，把历史写成感官体验，语言本身有一种阴湿的质地，读起来像是在潮湿空气里拨开什么东西往里走。
+
+苏童是中国当代文学里最擅长用氛围写历史的人之一。他的《妻妾成群》《红粉》《米》，都是在具体的感官细节里埋藏着历史的重量，但他从不正面处理历史，他只处理那些生活在历史缝隙里的人，处理他们的皮肤、气味、欲望和恐惧。你对「先给读者一个气氛、一种光线「的偏好，和他的叙事策略是相同的。
+
+他的语言有一种电影感——镜头感很强，总是从具体的视觉细节切入，用画面带动情绪，而不是直接陈述情绪。他写女性写得极好，那种被压抑、被凝视、在逼仄空间里挣扎的女性，在他笔下既是个体，也是某种历史处境的象征。
+
+他说，在那个潮湿的南方，一切都在腐烂与生长。腐烂与生长同时发生——这是苏童美学的核心：最衰败的地方往往有最旺盛的生命力，最腐朽的东西往往有最美的光泽。你的写作也有这种对「复杂同时性「的感受力。`,
+ v:{atmosphere:2,sensory:2,imagery:2,baroque:1,psychological:2,realism:1,detail:2}},
+{n:"李娟",en:"Li Juan",era:"中国 · 当代",
+ q:`在这么远的地方，我们都是彼此的全部世界。`,
+ d:`你的文字有李娟的那种轻盈——她写新疆牧场，写阿勒泰的冬天，写和母亲一起迁徙的生活，用一种几乎是孩子气的直接触碰到最深的真实。她不用大词，不用文学腔，但她的文字里有一种天然的精准，那种精准来自于她真的在那里，真的看见了，真的感受到了。
+
+李娟代表了中国当代散文里一种珍贵的声音：不装，不过度修饰，不追求深刻，但偏偏因为这种自然而显得深刻。她的句子短而清晰，她的观察细致而有趣，她对孤独的处理方式是把它变成可以一起看的风景，而不是一个需要解决的问题。你对「私密的、像在偷听别人独白的文字「的共鸣，和她的写作质地是相通的。
+
+她写的是边地生活，但她写出了一种普遍的人类处境：在广大的自然面前，一个人是多么渺小，同时又多么自足。那种自足不是骄傲，而是接受，是在接受了渺小之后的某种轻盈。
+
+她说，在这么远的地方，我们都是彼此的全部世界。这句话里有她写作的温度：远，是地理的远，也是心的某种孤绝；但「彼此的全部世界」，又是最深的依靠。你的写作里也有这种在孤独里维持温度的能力。`,
+ v:{intimate:2,minimalism:1,directness:2,atmosphere:2,imagery:1,confessional:2,detail:1}},
+// Japanese
+{n:"村上春树",en:"Haruki Murakami",era:"日本 · 当代",
+ q:`如果你不伤害，就不会深刻。`,
+ d:`你的写作有村上式的双重时态——现实与梦境共存，孤独是生活方式而非需要解决的问题。他写的不是悲剧，而是一种更难处理的状态：不特别痛苦，但也不特别快乐，像在一个半透明的玻璃里度过时光，外面的世界清晰可见，但隔着什么。
+
+村上春树把流行文化和文学意象融为一体——爵士乐、威士忌、猫、意大利面——这些日常细节不是装饰，而是他精确定位内心温度的方式。你在答题时对感官细节的依赖，和对「某种视觉或身体上的感知「的偏好，与他的叙事策略高度吻合：用物质世界的具体性来锚定内心世界的飘忽性。
+
+他的叙事里有一扇门，通往另一个世界。那个世界不是童话式的彼岸，而是现实的内面，是日常生活底层那个奇异的空间。那种超现实不是刻意的，而是从现实里自然生长出来的，像一个睡着的人忽然开始走路。你对超现实元素的接受度，和他的叙事直觉是相通的。
+
+他说，如果你不伤害，就不会深刻。这句话道出了他小说的核心矛盾：他的人物都在刻意保持距离，又在距离里感到痛苦。你的写作也有这种对「保持距离「的理解——有时候不投入才是最深的投入。`,
+ v:{sensory:2,intimate:2,atmosphere:2,surrealism:1,detail:2,minimalism:1,subtext:2}},
+{n:"川端康成",en:"Yasunari Kawabata",era:"日本 · 20世纪",
+ q:`花未眠，那是花的失眠，也是我的失眠。`,
+ d:`你的文字有川端的那种物哀——用一朵花、一片雪来承载整个消逝的重量。他是日本文学里「以小见大「最彻底的实践者：一个舞女的指尖、一面镜子里的倒影、山里的温泉旅馆，这些都不只是意象，而是整个宇宙的入口，是关于美与消逝的哲学的具体化。
+
+川端康成的语言极度洗练，几乎是诗句式的。他不解释，他呈现；他不分析，他感受。那种节制来自他对语言的极高要求：多余的字是对读者的冒犯，是对美的稀释。你在答题时对「句子的节奏和停顿恰到好处「的重视，和他的语言美学是相通的：节奏本身就是意义，停顿本身就是表达。
+
+他的小说里时间是凝滞的——不是停止，而是流动得很慢，像蜂蜜，让你看见每一个流动的细节。那种对「瞬间「的迷恋，那种对正在消逝的东西的深情注视，是他整个文学世界的核心。你对「时间几乎停止的，像被某个瞬间凝固「的叙事倾向，与他的时间感是相通的。
+
+他说，花未眠，那是花的失眠，也是我的失眠。这个意象——花在黑暗里独自绽放，没有人看见——是川端式忧郁的完美概括：美是孤独的，消逝是确定的，但正因为这样，每一个当下的美才值得那么认真地去感受。`,
+ v:{poetic:3,imagery:3,minimalism:2,restraint:2,atmosphere:2,sensory:2,subtext:2}},
+{n:"太宰治",en:"Osamu Dazai",era:"日本 · 20世纪",
+ q:`生而为人，我很抱歉。`,
+ d:`你的写作有太宰治的自毁之美——他把羞耻感写成了文体，把软弱写成了诚实。他是日本文学里最会「表演脆弱「的人，但那种表演不是假的，而是一种独特的诚实：他知道自己在表演，他让读者也知道，但这个表演本身揭示了某种比任何「正常「表述都更真实的东西。
+
+太宰治的文字里有一种特殊的温度：不是冷，不是热，而是那种退烧后的微汗感——清醒但还虚弱，理智但还在颤抖。他用第一人称写，但那个「我「始终处于自我质疑的状态，随时准备嘲笑自己，随时准备推翻刚刚说的话。你对带着「自我拆解「句式的偏好，与他的叙事姿态是相通的。
+
+他的故事里有一种无可奈何的爱——对人的爱，对世界的爱，但这种爱总是被某种根深蒂固的自我怀疑所腐蚀。他不相信自己有资格爱，也不相信自己有资格被爱，但他还是在写，还是在伸出手，尽管他知道那只手可能什么都够不到。
+
+他说，生而为人，我很抱歉。这句话是太宰治的全部——羞耻、幽默、绝望，以及一种奇怪的温柔，像是向所有被他连累过的人道歉，也像是向存在本身道歉。你的写作里也有这种对「存在之重「的感受，那种不知道该怎么拿这份重量的感觉。`,
+ v:{confessional:3,irony:2,psychological:2,intimate:3,analytical:1,restraint:1}},
+{n:"夏目漱石",en:"Natsume Soseki",era:"日本 · 19-20世纪",
+ q:`月亮很美，是吗？`,
+ d:`你的文字有漱石式的温柔清醒——他看透了人心的狭隘，却不放弃对温情的信念。他是日本近代文学奠基人，活在东西方文化剧烈碰撞的时代，他的小说就是那个碰撞本身：传统与现代、自我与他者、个人欲望与社会规范，在他的人物身上持续摩擦、持续燃烧。
+
+漱石对「自我「这个概念有一种持续的追问——什么是真正的自我？在他人的目光里被塑造的自我是真实的吗？那个在深夜独处时出现的自我又是什么？这种对自我本质的怀疑，在他的三部曲《心》《行人》《道草》里反复出现，像一个未解的数学题。你对「自我是被质疑和解构的对象「的选择，与他的哲学倾向是相通的。
+
+他的语言有一种特殊的亲切感——他不高高在上，他就坐在你旁边跟你说话，带着一点幽默，带着一点自嘲，但说的都是真的。他的幽默不是回避，而是一种进入——用笑声打开严肃的话题，让人在不那么设防的状态里接受那些难以承受的真实。
+
+他说，月亮很美，是吗？据说这是他教学生翻译」I love you「时说的话——把直接的情感表达换成了一个共同看见美的邀请。这个转换里有漱石最深的东西：爱不必宣言，只需一起看见同一个美丽的东西。`,
+ v:{psychological:2,philosophical:1,intimate:2,analytical:2,subtext:2,realism:1,irony:1}},
+// Latin American
+{n:"博尔赫斯",en:"Jorge Luis Borges",era:"阿根廷 · 20世纪",
+ q:`时间总是在分叉，通向无数的未来。`,
+ d:`你的写作是博尔赫斯式的迷宫——文字在此处不是情感的载体，而是哲学的装置，每一个故事都是一个精密的思想实验，图书馆等于宇宙，镜子等于无限，时间是分叉的花园而非单一的河流。
+
+博尔赫斯是文学史上少数几个真正把「形式即内容「实践到极致的作家。他写迷宫，他的结构本身就是迷宫；他写无限，他的文字本身就产生无限循环的效果。那种精密的形式自觉，那种用结构来表达哲学命题的野心，在你答题时对「用结构本身来暗示缺席的内容「的偏好里有所呼应。
+
+他博览群书，他的文字里充满了引用、典故、虚构的书目，真实与虚构的边界在他那里是刻意模糊的——因为他认为，所有的书都是对同一本书的注释，所有的故事都是对同一个故事的复述。你对「密集的文化与文学引用「的某种认同，与他的文学世界观是相通的。
+
+他的语言是冷静的、精确的，几乎是学术化的，但这种冷静里有一种深深的惊奇：他对世界的奇异性从未麻木，他只是用了一个数学家的语气来表达这种惊奇。
+
+他说，时间总是在分叉，通向无数的未来。你的写作也在探索那些分叉点——每一个选择之后，另一个可能性依然存在，只是在另一条路上继续走着。`,
+ v:{philosophical:3,experimental:3,baroque:2,analytical:2,surrealism:1,defamiliarization:2,metaphor:2}},
+{n:"加西亚·马尔克斯",en:"G.G. Márquez",era:"哥伦比亚 · 20世纪",
+ q:`人生不过是一场一生都在等待的偶遇。`,
+ d:`你的写作有马尔克斯那种「平静地说出荒诞」的能力——魔幻以日常的语气出现，奇迹被用陈述句处理，历史以神话的形态保存，所有的过去都活在现在，所有的死者都还在说话。
+
+马尔克斯和博尔赫斯是拉丁美洲文学的两极——一个往感官走，一个往智识走。马尔克斯的世界是充沛的、肉体性的、充满了雨水和鲜花和腐败和爱欲，他的语言也是这样，浓烈、流动、永远在生长。你对感官细节的依赖，和对「充沛的感官与集体记忆「的偏好，与他的文风有深刻的共鸣。
+
+《百年孤独》的开头——「多年以后，面对行刑队，奥雷里亚诺·布恩迪亚上校将会回想起父亲带他去见识冰块的那个遥远的下午」——这句话里包含了他的全部叙事哲学：时间是可以同时向前和向后的，记忆比现实更真实，人的一生可以在一个句子里来回穿越。
+
+他把小镇马孔多写成了整个拉丁美洲的缩影，把一个家族的历史写成了人类命运的寓言。那种把「地方性「升华为「普遍性「的能力，是你们共同的文学野心。
+
+他说，人生不过是一场一生都在等待的偶遇。这句话里有他对命运的理解——命中注定，但也充满偶然；预先写就，但也需要你走到那个拐角处。`,
+ v:{surrealism:3,baroque:2,imagery:2,social:2,atmosphere:2,sensory:2,realism:1}},
+{n:"科塔萨尔",en:"Julio Cortázar",era:"阿根廷 · 20世纪",
+ q:`游戏是唯一正经的事情。`,
+ d:`你的写作有科塔萨尔式的游戏感——他把文本变成玩具，把结构变成迷宫的入口，把阅读行为本身变成了一场需要读者主动参与的冒险。《跳房子》是他最极端的实验：一本可以按多种顺序阅读的小说，每一种顺序都是不同的故事，读者在跳读中共同创作意义。
+
+科塔萨尔对「日常生活的裂缝「有一种特殊的敏感——那些裂缝是现实和超现实之间的薄弱处，是奇异事物的入口。他写一个人爬进了一根排水管，他写一只老虎在公寓里出没，他写一个女人从窗户里爬出去失踪了——这些荒诞的事件被他用最平静的语气处理，仿佛它们是完全正常的。
+
+你对实验性叙事结构的偏好，和对「把阅读本身变成体验「的欣赏，与他的文学理想是相通的。他相信小说不应该只是传递一个故事，而应该是一次体验，一次改变读者认知坐标的旅程。
+
+他的语言兼具诗性和游戏性，有时轻盈飘逸，有时密集难解，但总是充满活力，充满一种对语言本身的快乐。这种对写作的「快乐感」，对语言可能性的热情探索，在你的文风基因里也有所体现。
+
+他说，游戏是唯一正经的事情。这句话里有他的整个美学立场：认真对待游戏，因为游戏才是最自由的认识世界的方式。`,
+ v:{experimental:3,playful:2,surrealism:2,defamiliarization:2,fragmented:2,metaphor:1}},
+{n:"巴尔加斯·略萨",en:"Mario Vargas Llosa",era:"秘鲁 · 当代",
+ q:`文学是对现实的有序反抗。`,
+ d:`你的写作有略萨式的叙事雄心——他把政治权力、个人欲望、历史暴力和私密情感编织成复杂的叙事网络，在那个网络里，每一个线头都连着其他的线头，一个人的命运就是整个体制的缩影，一段爱情就是整个政治结构的隐喻。
+
+略萨是拉丁美洲文学爆炸的核心人物之一，他和马尔克斯、科塔萨尔共同重新定义了什么是西班牙语小说可以做到的事情。但他和马尔克斯不同——他的写法更接近现实主义，他不依赖魔幻元素，他依靠结构的复杂性来承载历史的复杂性，用多重叙事视角来呈现政治现实的多个面向。
+
+你对「人与他人的关系和权力结构「的核心关切，和对「多重视角，同一事件多次折射「的叙事偏好，与他的写作策略是相通的。他不相信任何单一视角能呈现真实，他相信真实存在于多个视角的摩擦里，在那些相互矛盾的叙述之间的空间里。
+
+他的语言结合了精确的现实细节和有意识的叙事实验——他向福克纳学到了如何用技术性的叙事策略来制造情感效果，向萨特学到了如何让政治问题进入文学，向弗洛贝尔学到了对语言本身的极度严格。
+
+他说，文学是对现实的有序反抗。这句话里有他对文学功能的理解：反抗现实，但是有序的，有美学形式的，有文学纪律约束的反抗。你的写作也有这种对「把批判变成艺术「的意识。`,
+ v:{social:3,realism:2,baroque:1,analytical:1,psychological:1,experimental:1}},
+// European/French
+{n:"卡夫卡",en:"Franz Kafka",era:"奥地利 · 20世纪",
+ q:`书应当是砍破我们内心冰封海洋的斧头。`,
+ d:`你的写作有卡夫卡那种「用公文语气处理噩梦」的气质——他从不声称自己在写荒诞，荒诞就这样以最平静的方式出现。格里高尔·萨姆沙一觉醒来变成了甲虫，这件事被用汇报工作的语气陈述，仿佛这是一个需要处理的行政问题，而不是一场存在的灾难。
+
+卡夫卡是现代性焦虑最精确的文学镜像。他笔下的官僚体系不是背景，而是主角——那个永远说不清楚规则的体系，那个永远找不到的入口，那个永远不知道自己犯了什么罪的被告，是20世纪人类处境的最准确描述。你对「存在本身的荒诞与意义「的关切，与他的核心命题是相通的。
+
+他的语言有一种特殊的清晰：他用最透明的语法写最不透明的现实，用最具体的细节描述最抽象的困境。这种风格上的清晰和内容上的晦暗之间的落差，制造了一种独特的不安感。你对语言精确性的追求，和对「留白「的运用，与他的某些叙事策略是相通的。
+
+卡夫卡生前几乎没有发表过什么，他要求朋友马克斯·布罗德在他死后烧掉所有手稿。但布罗德没有。我们今天所知道的卡夫卡，是一个本不应该存在的卡夫卡。这件事本身就像卡夫卡小说里才会有的情节。
+
+他说，书应当是砍破我们内心冰封海洋的斧头。你的写作也有这种愿望：不只是讲一个故事，而是破开某种固化的认知，让某种新的感受进来。`,
+ v:{existential:3,surrealism:2,analytical:2,minimalism:1,philosophical:2,realism:1,restraint:2}},
+{n:"加缪",en:"Albert Camus",era:"法国 · 20世纪",
+ q:`在严冬，我终于知道，我身上有一个不可战胜的夏天。`,
+ d:`你的写作有加缪的那种清醒之美——在地中海强烈的阳光下看清虚无，然后决定继续走。他是20世纪最重要的存在主义作家之一，但他拒绝被任何标签限定：他既不同意萨特的某些政治立场，也不同意任何简化人类处境的理论。
+
+加缪的核心命题是「荒诞」——不是荒诞主义戏剧意义上的荒诞，而是一个非常具体的问题：当人需要意义、而世界沉默以对时，人应该怎么办？他在《西西弗神话》里的回答是：想象西西弗是快乐的。不是因为有意义，而是因为在推石头这件事本身里，有一种反抗，有一种人的尊严。
+
+你对「存在本身的荒诞与意义「的关切，和他的核心命题直接对应。你的写作里有一种对这个问题的持续追问，不试图给出最终答案，但也不愿意假装问题不存在。
+
+他的语言是干净的、克制的，有一种地中海的明亮感：没有多余的装饰，没有堆砌的情绪，但每一句话都有重量，都是在正视什么。你对「简洁、干净「风格的偏好，和他的语言美学是相通的：相信朴素的语言能承载最深的思考。
+
+他说，在严冬，我终于知道，我身上有一个不可战胜的夏天。这句话是他整个哲学的诗意概括：即使在最黑暗的处境里，有一种什么是无法被夺走的。你的写作也在寻找并守护那个「不可战胜的夏天」。`,
+ v:{existential:3,philosophical:2,minimalism:2,directness:2,restraint:1,realism:1,analytical:1}},
+{n:"杜拉斯",en:"Marguerite Duras",era:"法国 · 20世纪",
+ q:`写作，是对沉默的遮掩，也是对任何声音的遮掩。`,
+ d:`你的写作有杜拉斯的体温——她的语言在发烧，欲望与记忆交替浸染每一个句子，时间在她那里不是线性流动的，而是反复涌回来的，像潮水，像梦。
+
+杜拉斯的写作方式是独一无二的：她打破情节逻辑，让情感拥有自己的句法。她的句子有时很短，有时很长，有时一段话突然中断，留下一片空白，那个空白本身就是意义。她的《情人》用一种几乎是自我凝视的方式回溯童年的爱情，既清醒又执迷，既旁观又沉溺，那种双重性是她文风最独特的地方。
+
+你对「时间断裂的、在闪回与当下之间跳跃「的叙事偏好，和对情感「反复冲洗「的感受，与她的叙事结构是高度吻合的。她不相信直线时间，她相信记忆的时间——那种可以反复返回、每次返回都带来新的光线的时间。
+
+她的写作是极度女性化的，但这里的「女性化「不是柔软的意思，而是对身体感知、对情感纹理、对欲望本身的高度关注。她写爱情写得赤裸，但那种赤裸是精神意义上的，是把内心最深处那些说不清的东西暴露在光天化日之下。
+
+她说，写作，是对沉默的遮掩，也是对任何声音的遮掩。这句话里有她对写作本质的理解：写，是为了填补那个无法言说的空洞；但写本身又制造了新的遮掩，新的距离。你的写作也有这种对语言与沉默之间张力的感受。`,
+ v:{fragmented:2,poetic:2,intimate:3,confessional:2,atmosphere:2,psychological:2,experimental:1}},
+{n:"萨冈",en:"Françoise Sagan",era:"法国 · 20世纪",
+ q:`我喜欢孤独，因为它从不烦我。`,
+ d:`你的文字有萨冈的那种轻盈的哀伤——她用优雅的漫不经心承受沉重，用少女的声音说成年人的话，用一杯威士忌的时间处理整个人生的失落。她十八岁写出《你好，忧愁》，用一个少女清醒的眼睛看成年人世界里的游戏规则，那种不该属于那个年龄的清醒，后来成为她终生的文学气质。
+
+萨冈的风格是法国式的克制：情感很深，但不声张；心碎了，但保持仪态；爱过了，但用耸耸肩来表示结束。她不用大词，不高声，不咆哮，但她的语言里有一种精准的忧郁，那种忧郁不是悲剧式的，而是日常的、随时随地的，像香烟的烟雾，无处不在。
+
+你在答题时对「保持审视的距离「和「爱恨交织「处境的选择，与她的叙事距离是相通的：她爱她笔下的人物，但她也看见他们的荒唐；她理解那些游戏，但她拒绝被那些游戏完全吞没。那种同时在内部和外部的位置，是一种很难维持的平衡，但她做到了。
+
+她的句子通常很短，干净利落，但短句里包含着很多没说出来的东西——那些没说出来的部分，是她叙事里最重要的部分。你对「言外之意「和「留白「的偏好，与她的叙事策略是相通的。
+
+她说，我喜欢孤独，因为它从不烦我。这句话里有她的全部气质：接受孤独，和孤独相处，甚至找到孤独的好处——不是因为不需要他人，而是因为太清楚人与人之间那种永远无法完全弥合的距离。`,
+ v:{irony:2,intimate:1,restraint:1,subtext:2,minimalism:1,confessional:1,psychological:1}},
+{n:"波伏娃",en:"Simone de Beauvoir",era:"法国 · 20世纪",
+ q:`女人不是天生的，而是变成的。`,
+ d:`你的文字有波伏娃的那种分析性的热情——她把最私密的体验变成最普遍的命题，把个人处境写成结构性的揭示。她的《第二性》是思想史上的里程碑，但她的小说和自传才是她文学价值的真正所在：那些个人的、具体的、充满情感的叙述，和她的哲学思考相互照亮。
+
+波伏娃的写作有一种特殊的双重性：她同时是一个活在生活里的人，和一个分析生活的思想者。她和萨特的关系、她的情感经历、她对自由的理解，都成为她写作的材料——但她不只是陈述，她要理解，要命名，要找出那些经验背后的结构性原因。
+
+你对写作中「分析「与「坦诚「的同时在场的倾向，与她的写作方式是相通的：不只是感受，也要理解感受；不只是陈述发生了什么，也要追问为什么会这样。这种「边活着边思考「的写作姿态，是她最独特的贡献。
+
+她的语言是有力量的、直接的、不回避的。她不用委婉语，她直接说出那些被习惯性遮掩的东西，无论是关于性别、关于权力、还是关于爱情里的不对等。你对「直接命名感受「的写作本能，与她的语言策略是相通的。
+
+她说，女人不是天生的，而是变成的。这句话改变了20世纪人们对性别的理解。你的写作也有这种「揭示被建构之物「的冲动——那些看起来理所当然的东西，往往才是最需要被质疑的。`,
+ v:{analytical:3,confessional:2,social:2,philosophical:2,directness:2}},
+{n:"普鲁斯特",en:"Marcel Proust",era:"法国 · 20世纪",
+ q:`真正的探索之旅，不在于发现新土地，而在于拥有新的眼光。`,
+ d:`你的写作有普鲁斯特式的时间迷恋——他用一块玛德莲蛋糕泡在椴花茶里的气味，打开了整个童年，打开了贡布雷小镇的全部记忆，打开了那个在时间里失去的世界，然后用两千页的篇幅把它重新找回来。
+
+普鲁斯特相信，唯一真实的时间是记忆的时间，而不是钟表的时间。他的七卷本《追忆似水年华》就是一个巨大的论证：通过写作，通过把那些消逝的时刻重新感受一次，时间可以被战胜，过去的东西可以在当下重新活着。你对「时间几乎停止「和对「内心感知「的写作偏好，与他的时间哲学是深度吻合的。
+
+他的句子是著名的长——有时一个句子跨越好几行，有时一段心理描写从一个细节的细节的细节展开，像俄罗斯套娃，一层套一层，永无止境。这种繁复不是炫耀，而是对感知精确性的追求：他要追踪的那个感受，必须用这么多层次的从句才能被完整捕捉。
+
+他的写作是极度感官性的——气味、触觉、光线在他那里比任何大事件都更重要，因为正是那些感官印记，而不是那些被记录在历史上的事件，构成了一个人真正的内心历史。
+
+他说，真正的探索之旅，不在于发现新土地，而在于拥有新的眼光。你的写作也在做这件事：用语言给读者一双新的眼睛，看见那些本来就在那里但被忽视的东西。`,
+ v:{baroque:3,sensory:2,psychological:3,fragmented:1,intimate:2,atmosphere:2,imagery:2}},
+// Russian
+{n:"契诃夫",en:"Anton Chekhov",era:"俄国 · 19世纪末",
+ q:`没有什么是无聊的——只有无聊的人。`,
+ d:`你的文字有契诃夫的那种「不解释的力量」——他把生活的横断面放在那里，然后转身离开，不解释，不评判，不提供结论。他的短篇小说像精准的外科手术：切开，露出里面的样子，缝上，结束。读者的心脏是自己跳起来的，不是他逼的。
+
+契诃夫是现代短篇小说之父，他发明了一种新的叙事伦理：作家没有权利告诉读者应该怎么想，作家只需要准确地呈现。他的「冰山哲学「甚至早于海明威的表述：写出来的只是一小部分，更重的东西在水面以下，在那些没有被写出来的话里。你对「留白「和「侧写「的偏好，与他的叙事哲学是直接对应的。
+
+他的人物都是普通人——医生、老师、小官员、农民——他们的苦恼也都是普通的苦恼：无聊、孤独、错过、无法沟通。但正是这种普通性，让他的小说有了一种奇特的普遍性：每个人在他的人物身上都能认出自己的某个部分。
+
+他写《三姐妹》，三个女人说了整出戏的「去莫斯科」，但她们始终没有去。这不是悲剧，这比悲剧更真实：大多数人的生命里，那个「莫斯科「永远都在远处，永远都在等待合适的时机，而合适的时机永远都没有到来。
+
+他说，没有什么是无聊的——只有无聊的人。你的写作也有这种对「日常「的高度警觉，那种在平凡表面之下发现纹理和深度的能力。`,
+ v:{subtext:3,restraint:2,realism:2,minimalism:1,detail:2,analytical:1,atmosphere:1}},
+{n:"托尔斯泰",en:"Leo Tolstoy",era:"俄国 · 19世纪",
+ q:`每个人都想改变世界，却没有人想改变自己。`,
+ d:`你的写作有托尔斯泰式的宏大与细腻并存——他把一场拿破仑战争和一个贵族女孩的内心活动放在同一个时空里处理，用同样的认真和同样的耐心，仿佛历史事件和人的内心都有同等的重量，都值得同等的关注。
+
+托尔斯泰是文学史上最会写心理的作家之一，他的人物有极度真实的内心生活：他们会改变想法，会自我欺骗，会在前一分钟想着一件事而下一分钟做了完全相反的事。那种心理描写的精确性，来自他对人性的无尽好奇，和对道德问题的无法停止的追问。
+
+你对「心理深度「的偏好，和对人物「内心的悖论与自我欺骗「的兴趣，与他的叙事关注点是相通的。他写安娜·卡列尼娜，不只是写一个通奸的故事，他写的是一个人在社会规范和内心需求之间的撕裂，那种撕裂的真实性远超任何道德判断。
+
+他的写作是大的，但大里有无数的小——那些小细节，那些心理的微小波动，才是他真正写的东西，大的历史背景只是让那些小的东西得以彰显的容器。
+
+他说，每个人都想改变世界，却没有人想改变自己。这句话是他晚年思想的核心：一切的改变都必须从内部开始，从那个最难改变的自我开始。你的写作也有这种向内看的倾向，那种对内心真实性的坚持。`,
+ v:{realism:3,social:2,psychological:2,detail:2,philosophical:1,baroque:1}},
+{n:"陀思妥耶夫斯基",en:"Fyodor Dostoevsky",era:"俄国 · 19世纪",
+ q:`爱具体的人，不要爱抽象的人。`,
+ d:`你的写作有陀思妥耶夫斯基那种深渊式的强度——人物在极端处境里暴露最赤裸的心理，对话是思想的搏斗，每一次选择都牵涉到关于人的本质的最深追问。他的小说是心理实验室，也是道德法庭，也是形而上学的战场。
+
+陀思妥耶夫斯基笔下的人物没有一个是平静的——他们都在某种巨大的张力里生活，在信仰与虚无之间，在爱与恨之间，在自我毁灭的冲动和自我救赎的渴望之间。那种极端的张力不是他夸大了人性，而是他看见了人性里本来就存在的极端性，那些大多数时候被日常生活的惰性所压制的东西。
+
+你对「存在本身的荒诞与意义「的关切，和对人物「内心的悖论与自我欺骗「的兴趣，与他的核心命题是直接对应的。他的人物都在问：如果上帝不存在，那么一切都是被允许的吗？那个问题在他的小说里没有简单的答案，有的只是那个问题本身的巨大重量。
+
+他的对话是他最伟大的发明之一：人物在对话里暴露彼此，交锋彼此，甚至摧毁彼此，每一句话都藏着多重意义，每一次沉默都是未说出的战争。你对「言外之意「和「没有说出口的话「的敏感，与他的对话哲学是相通的。
+
+他说，爱具体的人，不要爱抽象的人。这是他最重要的教诲之一：爱人类很容易，爱面前这个具体的、令人恼怒的、不完美的人才是真正的考验。你的写作也有这种对「具体性「的坚持。`,
+ v:{psychological:3,existential:2,baroque:1,philosophical:2,social:1,confessional:1}},
+{n:"纳博科夫",en:"Vladimir Nabokov",era:"俄裔美国 · 20世纪",
+ q:`天赋无关道德，但道德无关才华。`,
+ d:`你的写作有纳博科夫式的语言自觉——他是20世纪最会用语言的作家之一，他的每个比喻都是新鲜的，每个细节都是精确的，散文本身是独立的感官体验。阅读他不只是在接受一个故事，而是在体验语言本身的可能性。
+
+纳博科夫对陈词滥调的厌恶是近乎道德层面的：他认为使用陈旧的比喻是一种懒惰，是对真实感知的背叛。他的「陌生化「是持续的、系统性的——他总是从一个你从未想到过的角度来描述一件事，让你看见那件事背后从未被注意到的维度。你对「陌生化「技法的认同，和对「把常见的东西写成陌生的奇迹「的欣赏，与他的写作策略是核心对应的。
+
+他是俄裔作家，用英语写作，同时精通俄、法、英三语。这种语言之间的位移，让他对每一种语言都有一种局外人的新鲜眼光，他用英语写作时总有一种轻微的「外国感」，那种外国感恰恰制造了陌生化的效果。
+
+他的道德立场是复杂的——《洛丽塔》的叙述者是一个恋童癖，但纳博科夫通过他写出了语言美化欲望的机制本身，那是一个关于自我叙事和道德视盲的精妙寓言。
+
+他说，天赋无关道德，但道德无关才华。你的写作也有这种对语言纯粹性的追求，那种相信语言有自己的精确和自己的伦理的信念。`,
+ v:{baroque:3,defamiliarization:3,imagery:2,analytical:2,irony:1,experimental:1}},
+{n:"布尔加科夫",en:"Mikhail Bulgakov",era:"俄国 · 20世纪",
+ q:`胆小鬼是最大的恶。`,
+ d:`你的写作有布尔加科夫式的讽刺狂想——他把魔鬼请进莫斯科，让荒诞照亮现实。《大师和玛格丽特》里的撒旦沃兰德和他的随从在斯大林时代的苏联招摇过市，暴露出那个时代所有的荒唐、腐败和虚伪——但他们不是反派，他们是唯一说真话的人。
+
+布尔加科夫用超现实主义来做政治批判，这是因为现实主义的手法在那个时代会被审查，但也因为他理解到：那个时代的荒诞程度本来就超出了现实主义的承载范围，只有用荒诞对抗荒诞，才能抵达某种更深的真实。你对「大幅扭曲，用超现实来揭示更深的真实「的写作倾向，与他的这个判断是相通的。
+
+他的语言充满活力，有时喜剧，有时恐怖，有时两者同时出现，制造一种让人不安的笑——你在笑，但笑着笑着有点冷。那种把最严肃的批判包裹在最欢乐的形式里的能力，是他最独特的文学贡献之一。
+
+他几乎在整个斯大林时代都无法正式发表作品，《大师和玛格丽特》在他死后才得以出版，他用几十年的时间不断修改它，把它变成了一部关于艺术家在极权下如何坚持创作的宣言。
+
+他说，胆小鬼是最大的恶。这句话里有他的全部道德立场：懦弱不是一种无害的缺点，而是一种积极的恶——因为懦弱让恶继续存在。你的写作也有这种对「站队「的意识，那种不愿意回避的清醒。`,
+ v:{surrealism:3,irony:2,social:2,defamiliarization:2,baroque:1,playful:1}},
+// British/Irish
+{n:"伍尔夫",en:"Virginia Woolf",era:"英国 · 20世纪",
+ q:`一个女人想要写作，必须有钱，和一间自己的房间。`,
+ d:`你的写作有伍尔夫的意识流质感——她发明了一种新的时间，不是钟表的时间，而是感知的时间，是一个下午的光线慢慢移动的时间，是一朵花开放和凋谢的时间，是内心里一个念头追着另一个念头的时间。
+
+伍尔夫相信，外在事件的重要性远不如那些事件在人心里激起的涟漪重要。所以她的小说里「发生的事情「往往很少，但内心世界的变化极其丰富，极其细腻，极其真实。她的《达洛维夫人》用一天的时间展开整个人生，《海浪》用六个人的内心独白写出了一种关于存在和消逝的音乐。
+
+你对「内心向度「的强烈偏好，和对「心理深度「的追求，与她的叙事方向是直接对应的。你们都相信，最重要的发生，发生在内部，而不是外部；最真实的历史，是感知的历史，而不是事件的历史。
+
+她的语言有一种诗歌的质地：意象密集，节奏有意识，有时一个句子读下来像一首短诗。她对女性写作处境的关切——那篇著名的《一间自己的房间》——也影响了后来无数写作者的自我认知。
+
+她说，一个女人想要写作，必须有钱，和一间自己的房间。这是关于创作条件的最实用的话，也是关于创作自由的最深刻的话。你的写作也需要那间房间——那个可以只属于你自己的语言空间。`,
+ v:{poetic:3,psychological:3,fragmented:1,atmosphere:2,intimate:2,experimental:2,sensory:2}},
+{n:"乔伊斯",en:"James Joyce",era:"爱尔兰 · 20世纪",
+ q:`错误是通向发现的大门。`,
+ d:`你的写作有乔伊斯式的激进实验——他把语言推到极限，让意识流不只是一种叙事技巧，而是语言本身的存在方式。《尤利西斯》用一天的时间重写了《奥德赛》，但那一天里装下了整个都柏林，装下了整个现代意识，装下了语言所能承载的一切可能性。
+
+乔伊斯对文学形式的破坏是系统性的：他打破了线性叙事，打破了单一视角，打破了标准句法，最后在《芬尼根的守灵夜》里打破了单一语言本身——那本书用了多种语言混合写成，每一个词都可能同时是多种语言里的多个词，意义在这种多重性里无限增殖。
+
+你对实验性写作的偏好，和对「打破语言本身的边界「的欣赏，与他的文学理想是核心对应的。他相信文学不应该只是讲一个故事，而应该是对语言本身的探索，对感知本身的探索。
+
+他的《都柏林人》是他早期的作品，风格相对传统，但每一篇都有一个他著名的「顿悟「时刻——那个平凡生活里的裂缝，那个日常经验里突然闪现的永恒维度。你对「从细节开始进入大的真实「的写作策略，与他的这个叙事哲学是相通的。
+
+他说，错误是通向发现的大门。你的写作也有这种对「偏离「的包容，对「意外转向「的开放，对语言里那些意想不到的弯道的欢迎。`,
+ v:{experimental:3,fragmented:2,defamiliarization:2,baroque:2,psychological:2}},
+{n:"奥斯丁",en:"Jane Austen",era:"英国 · 19世纪",
+ q:`我爱得越深，表达得越少。`,
+ d:`你的文字有奥斯丁式的讽刺智识——她用优雅的笑话说最严肃的批判，用婚姻写权力关系，用客厅写整个社会结构，用礼貌的对话写残酷的现实。她的小说看起来是爱情故事，实际上是关于19世纪英国中产阶级社会运作机制的精密解剖。
+
+奥斯丁的反讽是她最伟大的文学工具。《傲慢与偏见》的开头——「凡是有钱的单身男人，必定需要一位太太，这已经是个举世公认的真理」——这句话用完全认真的语气说出了一个荒诞的命题，整本书就是在解构这个命题的同时又无法完全摆脱它。
+
+你对讽刺的理解和运用，和对「看似轻盈实则锋利「写作风格的偏好，与她的写作策略是相通的。你们都相信，笑有时候比哭更有力量；嘲讽有时候比控诉更深刻。那种表面的轻松背后是极其清醒的认识，那是一种很难维持的双重性。
+
+她的语言极度精确，她的叙事距离极度精准——不太近，不太远，保持一个让讽刺能够生效的最佳位置。那种距离不是冷漠，而是对清醒的坚持，是拒绝被任何一种情绪淹没的自持。
+
+她说，我爱得越深，表达得越少。这句话里有奥斯丁式的悖论：克制是爱最深沉的形态；越是真实的情感，越不需要宣言。你的写作也有这种对克制的理解，那种相信「没说出来的「比「说出来的「更有重量的信念。`,
+ v:{irony:3,analytical:2,social:2,minimalism:1,subtext:2,realism:1,directness:1}},
+{n:"狄更斯",en:"Charles Dickens",era:"英国 · 19世纪",
+ q:`这是最好的时代，也是最坏的时代。`,
+ d:`你的写作有狄更斯式的感染力——他的人物过于鲜明以至于几乎是漫画，但正因此他们才永远留在记忆里。斯科鲁奇、匹克威克、雾都孤儿、远大前程的皮普，这些人物已经超越了他们所在的故事，成为了某种原型，成为了英语世界里关于贪婪、善良、阶级和命运的共同语言。
+
+狄更斯是19世纪最伟大的社会批判者之一，但他的批判不是抽象的，而是通过极其具体的人物和场景来实现的：伦敦的雾、贫民窟的臭气、工厂里的噪音，这些都不只是背景，而是他批判的对象本身的具体化。你对感官细节的偏好，和对社会现实的关切，与他的写作方式有所呼应。
+
+他的语言充满活力，有时滑稽，有时煽情，有时庄严——他不害怕情感，他拥抱情感。他知道读者需要被感动，他也相信被感动本身就有道德价值：一个人如果能被书里的人物的苦难所触动，他就离成为一个更好的人近了一步。
+
+他是第一批真正把写作当作社会工具来使用的作家之一：他的小说直接推动了英国的工厂法改革、改善了孤儿院的条件、让公众意识到债务人监狱的残酷。文字的力量，在他那里不是隐喻，而是现实。
+
+他说，这是最好的时代，也是最坏的时代。这句话可以说是最好地概括了他的历史感：每个时代都同时是最好的和最坏的，关键在于你站在哪里看。`,
+ v:{social:3,realism:2,directness:2,detail:2,sensory:1,baroque:1}},
+{n:"艾米莉·勃朗特",en:"Emily Brontë",era:"英国 · 19世纪",
+ q:`我是荒原，也是风暴。`,
+ d:`你的写作有艾米莉·勃朗特式的野性与极端——她把荒原和人心写成同一种东西，那个凛冽的约克郡荒原不是背景，而是她的语言本身，是她内心的地理。《呼啸山庄》不是一个爱情故事，而是一个关于灵魂本质的神话，一个关于爱可以被残酷扭曲到什么程度的极端实验。
+
+她只写了一部小说，但那一部小说就已经是不朽的了。那种近乎疯狂的情感强度，那种拒绝任何世俗妥协的气质，那种把一切推到极端然后看它在极端里会变成什么的写作方式，是文学史上极少数真正做到了的尝试。
+
+你对「强烈的「情感的偏好，和对「直接投入、几乎合为一体「的写作关系，与她的写作气质是相通的。她不保持距离，她进入；她不观察，她燃烧。那种燃烧是有代价的，但它产生的光也是真实的。
+
+她的诗歌甚至比她的小说更能代表她：那些诗里有一种孤绝的自足，一种拒绝被任何外力定义的内在坚硬，一种面对死亡和虚无时的奇怪平静。她不需要被任何人理解，她写作不是为了读者，而是因为那是她存在的方式。
+
+她说，我是荒原，也是风暴。这句话里有她的全部：不是站在荒原上看风暴，而是本身就是荒原，本身就是风暴。你的写作里也有这种渴望——不是描述激烈，而是成为激烈本身。`,
+ v:{confessional:2,atmosphere:3,imagery:2,psychological:2,intimate:1,directness:1}},
+{n:"石黑一雄",en:"Kazuo Ishiguro",era:"英日 · 当代",
+ q:`记忆并不总是我们自愿的。`,
+ d:`你的写作有石黑一雄式的不可靠叙述者气质——他的人物总是在有意无意地回避核心真相，他们的叙述有着精心维系的表面，但在那个表面之下，是没有被说出来的丧失、未被承认的罪愆，和无法被正视的遗憾。
+
+石黑一雄是运用「不可靠叙述「最出色的当代作家之一。《长日将尽》里的管家史蒂文斯用整本书的篇幅来叙述自己的职业生涯，但那些叙述本身就是一种压抑——对自己情感的压抑，对道德判断的压抑，对生命里错误选择的压抑。读者通过那些被压抑的部分，反而感知到了最深的痛苦。
+
+你对「克制「的高度认同，和对「用什么不说来说什么「的叙事偏好，与他的核心技法是直接对应的。他相信，克制不是压抑情感，而是让情感在克制里产生更大的压力；那个未说出来的东西，比任何直接表述都更有重量。
+
+他的语言是温柔的、迂回的，有一种东西方文化融合产生的特殊质地——日本式的礼貌和克制，英语式的精确和优雅，融合成一种独特的文学声音。那种声音永远不高声，但你在安静里能感受到它有多重。
+
+他说，记忆并不总是我们自愿的。这句话里有他对记忆本质的理解：记忆来找你，而不是你去找记忆；那些最重要的事情，总是在你最没有防备的时候涌现。你的写作也有这种对「记忆涌现「的感受力。`,
+ v:{subtext:3,restraint:3,psychological:2,irony:1,minimalism:1,analytical:1}},
+// German/Central European
+{n:"黑塞",en:"Hermann Hesse",era:"德国 · 20世纪",
+ q:`世界上最艰难的事，是认识自己。`,
+ d:`你的写作有黑塞的精神漫游气质——他的每一本书都是一次自我解体和重建，寻找不是目的地而是状态本身，那种不断离开、不断回归、不断在两极之间寻找平衡的旅程，就是他全部文学的核心。《悉达多》《荒野之狼》《纳尔齐斯与歌尔德蒙》，每一本都是关于一个人如何在分裂的自我之间寻找统一，在对立的价值之间寻找和解。
+
+黑塞是最擅长写「灵魂危机「的作家之一——不是戏剧性的外部危机，而是那种更难描述的内部状态：不知道自己是谁，不知道自己应该想要什么，感到某种本质性的分裂，仿佛有两个自己在争夺同一具身体。
+
+你对「个人的内心与记忆「的核心关切，和对「自我是被质疑和解构的对象「的认同，与他的写作命题是深度吻合的。他一生都在追问：一个人怎样才能活成完整的自己？这个问题没有最终答案，但追问的过程本身就是意义。
+
+他受到荣格心理学和东方哲学的深刻影响，这使他的写作里有一种特殊的东西：他把心理学的分析和神话的直觉结合在一起，让内心的探索既有理性的精确，又有象征的深度。
+
+他说，世界上最艰难的事，是认识自己。你的写作也是这个困难事业的一部分——用语言逼近那个永远在移动的自我，看见它，命名它，哪怕只是暂时的。`,
+ v:{confessional:3,philosophical:2,psychological:2,intimate:2,existential:2,poetic:1}},
+{n:"托马斯·曼",en:"Thomas Mann",era:"德国 · 20世纪",
+ q:`艺术家的秘密，是他把所有的爱都给了自己的作品。`,
+ d:`你的写作有托马斯·曼的那种宏大叙事野心——用一个家族或一所山间疗养院来解剖整个欧洲文明，让个体的命运折射出时代的精神危机，让一个人的选择承担整个文化的重量。《布登勃洛克家族》是关于一个商人家族四代人的衰落，但它也是关于资产阶级文明本身的衰落；《魔山》里汉斯·卡斯托普在瑞士疗养院的七年，是整个欧洲在一战前那种危险的知识氛围的完美隐喻。
+
+曼的写作是建筑式的——有精心设计的结构，有内在的音乐性，有层层叠加的象征系统。他的散文密度极高，思想与叙事水乳交融，你不可能只是「看故事」，你必须同时思考那个故事在说什么更大的东西。
+
+你对「哲学性「思考的偏好，和对「思想密度高，需要慢读细思「的欣赏，与他的写作风格是相通的。他相信小说应该能承载最严肃的思想，而不只是提供娱乐或情感满足。
+
+他的对立主题是贯穿一生的：艺术家与市民，精神与现实，疾病与健康，东方与西方，衰退与再生。那些对立不是他试图解决的问题，而是他试图呈现的张力，因为那种张力本身就是人类文化的真实状态。
+
+他说，艺术家的秘密，是他把所有的爱都给了自己的作品。你的写作也有这种全情投入的意志，那种把创作当作最重要的事情来对待的认真。`,
+ v:{baroque:2,social:2,philosophical:2,analytical:2,psychological:2,realism:1}},
+{n:"里尔克",en:"Rainer Maria Rilke",era:"奥地利 · 20世纪",
+ q:`你必须改变你的生活。`,
+ d:`你的文字有里尔克的那种对神圣感的寻找——他的散文诗把孤独变成修行，把美变成一种义务，把对天使的渴望写成了整个人类精神处境的隐喻。《杜伊诺哀歌》和《献给奥尔菲斯的十四行诗》是20世纪德语诗歌的顶峰，但他的散文诗和书信也同样重要——那些写给一个年轻诗人的信，是关于创作和生命的最好的建议。
+
+里尔克对语言有一种近乎宗教式的虔诚：他相信语言是神圣的，每一个词都应该是必要的，每一个意象都应该是从感知深处生长出来的，而不是从现有的表达里借用的。他的写作过程是极度缓慢的——他花了十年时间等待《杜伊诺哀歌》的完成，因为他不愿意在感知还没有成熟时就动笔。
+
+你对「诗性语言「的偏好，和对「语言的节奏和停顿「的重视，与他的语言美学是核心对应的。他相信节奏是意义的一部分，不只是形式的装饰；一首诗的节奏里包含着一种感知方式，那种感知方式无法用其他方式传达。
+
+他的孤独是主动的——他离开了他爱的人，离开了各种团体和群体，因为他相信真正的创作需要彻底的孤独。那种主动选择的孤独，和他作品里对孤独的礼赞，是相互照应的。
+
+他说，你必须改变你的生活。这是他看到古典雕像后写下的诗的最后一行——那句突如其来的命令，是整首诗的核心：美是一种要求，是一种召唤，要求你变成能够承载它的人。`,
+ v:{poetic:3,philosophical:2,confessional:2,imagery:2,atmosphere:2,existential:1,minimalism:1}},
+{n:"昆德拉",en:"Milan Kundera",era:"捷克·法国 · 20世纪",
+ q:`生命中有些事情，轻得不可承受。`,
+ d:`你的写作有昆德拉的那种审视式抒情——他把最私密的爱欲和最公共的历史放在同一框架里，用哲学提问穿插叙事，让情节在半路暂停来讨论一个概念，然后再继续。这种混合的文体——小说、随笔、音乐——是他独特的发明。
+
+昆德拉认为小说是「探讨的艺术」，是一种认识世界的独特方式，这种方式无法被哲学或历史学所替代，因为它能同时持有相互矛盾的多种可能性，不需要给出最终结论。他的人物都是某种存在可能性的体现，他们的命运是对某个哲学问题的具体探索。
+
+你对「叙事中穿插哲学追问「的偏好，和对「提出比答案更好的问题「的文学理解，与他的小说观是深度吻合的。他相信文学的价值不在于给出答案，而在于把问题提得更好、更准确、更有趣。
+
+他的语言有一种特殊的节制——不是情感上的节制，而是一种修辞上的精确控制，不让情感溢出它应有的容器。那种控制是自觉的，是他对廉价的感伤主义的抵抗。你对克制与情感之间张力的理解，与他的文学态度是相通的。
+
+他说，生命中有些事情，轻得不可承受。这个悖论是他整个文学世界的钥匙：重量是可以承受的，因为它给了我们阻力，给了我们扎根的感觉；但轻盈——那种一切都无关紧要的虚无感——才是真正难以承受的。`,
+ v:{philosophical:2,irony:2,analytical:2,social:1,psychological:2,intimate:1,experimental:1}},
+// American
+{n:"海明威",en:"Ernest Hemingway",era:"美国 · 20世纪",
+ q:`如果你有幸年轻时在巴黎生活过，那么余生无论在哪里，它都会跟着你。`,
+ d:`你的写作有海明威式的冰山哲学——他写出来的是八分之一，隐藏在水下的是八分之七。表面极度简单的语言之下，是一整套精心设计的留白系统。那些没有被说出来的东西——那对夫妻到底在谈什么，那个钓鱼的人在逃避什么，那个老人在水里搏斗的究竟是什么——才是他真正写的东西。
+
+海明威发展出了一种新的散文美学：短句，主动语态，具体名词，最低限度的形容词，最低限度的解释。他把「不写什么「当作核心的写作技能，相信一个作家如果真正理解他要写的东西，他可以省略它，但它依然会存在于那些已经写出来的部分里。
+
+你对克制的高度认同，和对「用最少的字说最多的东西「的欣赏，与他的核心写作哲学是直接对应的。你们都相信，语言的节省是一种力量，而不是一种损失；那些被留下的空间里，读者的感知会自动填入。
+
+他是记者出身，这让他的语言有一种新闻式的简洁和准确：只写可以确认的事实，只用可以感知的细节，不做情感上的诠释，让事实自己说话。但他的事实不是普通的事实，他选择的每一个细节都经过精心挑选，都承担了超出其本身的重量。
+
+他说，如果你有幸年轻时在巴黎生活过，那么余生无论在哪里，它都会跟着你。你的写作也有这种对「某个决定性的时间地点「的执念，那种相信某些地方和时刻会永远留在一个人身上的感受。`,
+ v:{minimalism:3,subtext:3,restraint:3,directness:2,realism:2}},
+{n:"福克纳",en:"William Faulkner",era:"美国 · 20世纪",
+ q:`过去永远不会死，它甚至还没有成为过去。`,
+ d:`你的写作有福克纳的时间迷宫——过去从未消逝，它甚至还没有成为过去。他创造了约克纳帕塌法县，一个虚构的密西西比郡，在那里，美国南方的历史——奴隶制、内战的失败、种族隔离、家族的衰落——被反复叙述，从不同的角度，在不同的时间层，以不同的可靠程度。
+
+福克纳的叙事技法是极端的：意识流，多重叙述者，非线性时间，同一事件从不同视角被讲述多次，每一次都多一层意义，少一层确定性。《喧哗与骚动》从一个智识残障的男人的视角开始，那个视角没有时间概念，过去和现在交织在一起，读者必须主动重建那个叙事所指向的事件序列。
+
+你对「断裂的、在闪回与当下之间跳跃「的叙事倾向，和对复杂叙事结构的欣赏，与他的实验精神是相通的。他相信，对于某些复杂的历史和心理真相，只有形式的复杂性才能忠实地表达它们。
+
+他的语言同样是繁复的——他的句子可以非常非常长，从句套着从句，一个括号插进另一个括号，像是要在一个句子里捕捉意识的全部流动。那种繁复不是矫情，而是对思维实际运作方式的忠实再现。
+
+他说，过去永远不会死，它甚至还没有成为过去。你的写作也有这种对历史作为「当下之重量「的理解，那种过去总是活在当下、总是要求被回答的感受。`,
+ v:{fragmented:2,baroque:2,psychological:2,social:1,atmosphere:2,surrealism:1,experimental:1}},
+{n:"托妮·莫里森",en:"Toni Morrison",era:"美国 · 20世纪",
+ q:`如果你有一个故事，就讲它。`,
+ d:`你的写作有莫里森的史诗力量——她把历史的创伤写进身体和土地，让每一个词都承担记忆的重量。她的小说不只是讲故事，而是在为那些被历史遗忘的人建造一座纪念碑，用语言把那些沉默了几个世纪的声音重新带回来。
+
+《宠儿》是她的顶峰之作：一个逃跑的奴隶杀死了自己的女儿以免她被抓回去，那个死去的孩子后来以鬼魂的形式回来。那个鬼魂不只是一个叙事装置，它是整个奴隶制历史的创伤所化成的，是那些被压抑的、被遗忘的、没有被哀悼过的一切的具象。
+
+她把个人的痛苦放入集体历史的方式，是她最重要的写作策略：一个女人的故事就是整个民族的故事，一个身体的经历就是整个历史的经历，没有什么是单独存在的，每一个个体都被无数条历史的线索穿过。
+
+她的语言有一种诗歌的密度和音乐性——她本人说她在写作时想着黑人音乐的传统，那种语言里的音乐感不只是表面的修辞，而是一种承载意义的方式：某些东西只能被唱出来，而不能被说清楚。
+
+她说，如果你有一个故事，就讲它。这句话里有她对叙事权力的理解：谁有权讲故事，谁就有权定义历史；拿回讲故事的权利，是拿回历史主体性的第一步。你的写作也有这种对讲故事之意义的认真对待。`,
+ v:{social:3,baroque:1,imagery:2,psychological:2,atmosphere:2,poetic:1,surrealism:1}},
+{n:"卡佛",en:"Raymond Carver",era:"美国 · 20世纪",
+ q:`那是生活中最重要的几小时，但我们并不知道。`,
+ d:`你的写作有卡佛的「脏现实主义」——在普通人的日常里，用最少的语言表达最大的绝望和希望，在那些喝酒、吵架、沉默、试图和解的普通场景里，捕捉到某种更大的、关于人的处境的真实。
+
+卡佛笔下的人物都是蓝领阶级——工厂工人、服务员、卡车司机——他们的生活里没有宏大叙事，只有账单、失业、破裂的婚姻，和偶尔出现的、改变一切的对话。那些对话往往不长，有时只有几句，但那几句话改变了所有的东西，或者什么都没有改变，但一切都已经不同了。
+
+你对极简风格的偏好，和对「克制是一种力量「的深度认同，与他的写作哲学是核心对应的。他是海明威的继承人，把冰山哲学带进了美国郊区的厨房餐桌旁，带进了那些普通人的普通对话里。那种克制不是艺术的选择，而是道德的选择：这些人的生活已经够艰难了，作家没有资格用华丽的语言再消费他们的痛苦。
+
+他的留白是他最有力的叙事工具：一个对话中的停顿，一个场景结束时的突然切断，那些被省略掉的部分是读者自己必须去感受的部分。那种感受不能被给予，只能被激发。
+
+他说，那是生活中最重要的几小时，但我们并不知道。这句话里有他对生命的理解：最重要的时刻往往在当下是认不出来的，只有回头看才知道那就是一切的转折点。`,
+ v:{minimalism:3,realism:3,subtext:3,restraint:2,directness:2,detail:1}},
+{n:"塞林格",en:"J.D. Salinger",era:"美国 · 20世纪",
+ q:`有时候我只想打电话给某个人，但又不知道该打给谁。`,
+ d:`你的写作有塞林格的那种青少年式清醒——用一个少年的眼睛看穿所有那些「假模假式」的东西，那种愤怒与脆弱同时在场的声音，那种在不理解成人世界的同时又太清楚地理解它的矛盾处境。
+
+霍尔顿·考菲尔德是文学史上最成功的叙述者之一，不是因为他有多么了不起，而是因为他有多么真实：那种想要联系但又害怕被拒绝的矛盾，那种对虚伪的敏锐感知和对真诚的渴望，那种同时需要一个人又不知道怎么跟人在一起的状态，是普遍的人类经验，但很少被写得那么准确。
+
+你对「私密的、像在偷听别人独白的文字「的偏好，和对「只为自己写「的写作姿态，与塞林格的叙事伦理是相通的：他写的时候不是在向大众发言，他是在和某一个特定的、能懂他的读者说话；那种私密性是他最独特的文学质地。
+
+他的语言是口语化的——不是粗糙的口语，而是精心设计过的口语，那种设计让人感觉不到设计的存在，让人觉得自己真的在听一个人说话，而不是在读一本书。那种口语化的精确，比任何精雕细琢的书面语都更难做到。
+
+他说，有时候我只想打电话给某个人，但又不知道该打给谁。这句话是关于孤独的最准确表述之一：不是完全的孤独，而是那种有联系的渴望但找不到对象的状态。你的写作也有这种对「无处诉说的诉说「的理解。`,
+ v:{intimate:2,confessional:2,irony:2,directness:2,psychological:2}},
+{n:"苏珊·桑塔格",en:"Susan Sontag",era:"美国 · 20世纪",
+ q:`不要把照片当作证据，要把它当作感知。`,
+ d:`你的写作有桑塔格式的智识密度——她把批评文章写成艺术品，把观点写成感受，把感受写成观点，在思想和美学之间没有明显的边界，每一篇文章都同时是分析和创作。
+
+桑塔格是20世纪后半叶最重要的知识分子之一，她的《论摄影》《疾病的隐喻》《关于他人的痛苦》是同类写作的典范：不只是学术分析，而是一种介入，一种以写作的力量改变读者认知坐标的尝试。
+
+你对分析距离的保持，和对「文字承载思想「的高度重视，与她的写作立场是相通的。她相信知识分子的责任是不停地质疑那些被视为理所当然的东西，包括质疑她自己曾经写过的东西——她后来修正了《论摄影》里的某些立场，那种自我修正本身就是她智识诚实的体现。
+
+她的语言是有力量的，直接的，不绕弯子。她不把重要的话藏在修辞的迷雾里，她直接说，让读者直接面对。那种直接不是鲁莽，而是对清晰性的道德追求：复杂的思想需要被表达清楚，而不是被故意搞复杂。
+
+她说，不要把照片当作证据，要把它当作感知。这句话里有她思考图像和现实关系的核心：所有的再现都是一种感知方式，而不是对现实的透明呈现。你的写作也有这种对「呈现本身是一种解释「的意识。`,
+ v:{analytical:3,philosophical:2,directness:2,experimental:1,social:1}},
+// Italian/Nordic
+{n:"卡尔维诺",en:"Italo Calvino",era:"意大利 · 20世纪",
+ q:`轻，不是肤浅，而是对重量的克服。`,
+ d:`你的写作有卡尔维诺的那种清晰与奇幻并存——他用最透明的语言建构最不可能的世界，把思想实验包装成童话，把哲学命题写成冒险故事，让最严肃的追问穿着最轻盈的外衣出现。
+
+卡尔维诺是意大利文学里最重要的后现代实验者之一，但他的实验从来不是为了晦涩而晦涩——他相信清晰是最重要的文学美德之一。《看不见的城市》里的每一座城市都是一个概念的具象，《宇宙奇趣》里的故事都是宇宙科学事实的奇幻扩展，《如果在冬夜，一个旅人》直接把「阅读行为「写成了故事的主角。
+
+你对实验性叙事的偏好，和对「清晰与奇幻同时在场「的欣赏，与他的文学理想是相通的。他在晚年哈佛演讲里总结了他认为文学最重要的品质：轻盈、速度、精确、鲜明、多元。那些品质不是技术要求，而是世界观的体现。
+
+他的语言有一种游戏性，但那种游戏是认真的游戏——他在玩结构，在玩概念，在玩可能性，但每一次玩都在探索某个真实的问题，那个问题关于人类如何认识世界，关于语言如何制造意义，关于叙事如何创造现实。
+
+他说，轻，不是肤浅，而是对重量的克服。你的写作也有这种对轻盈的追求，那种相信用最少的力气可以撬动最大的重量的信念。`,
+ v:{experimental:2,philosophical:2,imagery:2,minimalism:1,surrealism:2,playful:1,defamiliarization:2}},
+{n:"艾柯",en:"Umberto Eco",era:"意大利 · 20世纪",
+ q:`书是一面镜子，如果一只猴子看，里面是猴子。`,
+ d:`你的写作有艾柯式的博学迷宫——他把百科全书变成叙事，把符号学变成悬疑小说，把中世纪神学变成当代阅读的刺激体验。《玫瑰之名》是一个修道院里发生的谋杀案，但它同时是一部关于中世纪神学争论的学术著作，一篇关于图书馆和知识管理的寓言，以及一个关于真相是否可知的哲学思考。
+
+艾柯是学者出身，他把学者的博学和小说家的叙事欲望结合在一起，创造了一种混合的写作形式：故事里装满了知识，但那些知识不是展示的，而是在叙事里活动的，是推动情节的力量，是解开谜题的钥匙。你对密集的文化引用的认同，和对「思想密度高「的作品的偏爱，与他的写作方式是相通的。
+
+他的叙事里有一种特殊的快乐——解谜的快乐，发现隐藏联系的快乐，看见表面下那个更大的结构的快乐。那种快乐不只是知识上的，也是审美上的：一个精心设计的符号系统，就像一架精密的机器，它的运转本身就是一种美。
+
+他对「后现代性「有深刻的洞察：在一个所有故事都已经被讲过的时代，怎样还能讲出新的故事？他的答案是引用、戏仿、互文——不假装自己是第一个，而是通过和所有前人的对话来创造新的意义。
+
+他说，书是一面镜子，如果一只猴子看，里面是猴子。这个悖论指向阅读的本质：我们在书里看见的，总是我们自己带去的。`,
+ v:{baroque:2,philosophical:2,experimental:2,analytical:2,imagery:1,irony:1}},
+// Other European
+{n:"帕慕克",en:"Orhan Pamuk",era:"土耳其 · 当代",
+ q:`我们活在历史的阴影下，却假装面向未来。`,
+ d:`你的写作有帕慕克的那种忧郁之城气质——他把伊斯坦布尔的双重性写成自我的内在冲突，那座城市在东方和西方之间，在传统和现代之间，在光荣的过去和困窘的现在之间——那种撕裂不只是地理的，也是心理的，是一个人站在两种文化夹缝里的存在状态。
+
+帕慕克创造了「呼愁「这个概念来描述伊斯坦布尔独特的忧郁气质——不是个人的悲伤，而是一座城市对自身衰落的集体感受，是对失去的帝国、失去的文化、失去的确定性的弥漫性哀愁。他把这种城市情感和个人的成长经历交织在一起，创造了一种独特的文学空间。
+
+你对「氛围营造「的偏好，和对「记忆与感知「的叙事重心，与他的写作策略是相通的。他用城市的气息和光线来建构人物的内心，用历史的厚度来承载个人的困惑。那种城市与个体之间的渗透关系，是他最独特的叙事资产。
+
+他的写作里有一种自我意识——他知道他在写作，他知道写作是一种建构，他让读者也意识到这个建构的存在。那种元叙事的自觉，和对「虚构与真实之间边界「的持续质疑，是他和博尔赫斯、卡尔维诺在某种程度上的精神亲缘。
+
+他说，我们活在历史的阴影下，却假装面向未来。你的写作也有这种对历史与当下关系的感受，那种过去总是在场、总是以某种方式决定着现在的意识。`,
+ v:{atmosphere:2,confessional:2,philosophical:1,imagery:2,intimate:2,realism:1,fragmented:1}},
+{n:"塞巴尔德",en:"W.G. Sebald",era:"德裔英国 · 20世纪",
+ q:`记忆，是一种对失落之物的忠诚。`,
+ d:`你的写作有塞巴尔德的那种记忆考古质感——他把历史创伤放进日常漫游里，一个人走路或乘火车，思维跟着走，时间开始折叠，现在和过去、个人和历史、真实和虚构之间的边界开始模糊。他的书里夹着黑白照片，那些照片不是插图，而是记忆本身的物质性证据，是时间曾经存在过的证明。
+
+塞巴尔德是20世纪末最独特的文学声音之一：他写的不是虚构，也不是非虚构，而是某种介于之间的东西——真实的历史事件和虚构的叙述者交织在一起，使得任何单一的分类都失效。他是德国人，写的是纳粹时代的记忆和罪责，但他不直接处理那段历史，他从侧面接近，通过那些被流放的人，被遗忘的建筑，被摧毁的景观。
+
+你对「氛围「和「碎片叙事「的偏好，和对「历史作为当下之重量「的感受，与他的叙事方式是深度吻合的。他的文字里有一种特殊的忧郁，那种忧郁来自对失落之物的高度敏感，来自对记忆的不可靠性的清醒意识，来自对那些沉默的、被遗忘的人的深切牵挂。
+
+他的语言是缓慢的、绵延的，有时一段话跨越好几页，带着读者进入一种冥想的状态，让时间的流速改变，让那些通常被匆匆略过的东西慢慢变得可见。
+
+他说，记忆，是一种对失落之物的忠诚。你的写作也是这种忠诚的实践——通过语言，让那些消逝的东西再活一次。`,
+ v:{fragmented:2,atmosphere:3,imagery:2,analytical:1,philosophical:2,realism:1,poetic:1}},
+{n:"门罗",en:"Alice Munro",era:"加拿大 · 当代",
+ q:`平凡的生活里，有最复杂的心理地理。`,
+ d:`你的写作有门罗的时间跳跃感——她在短篇的篇幅里压缩整个人生，用几十年后的视角回看年轻时的时刻，让同一件事在不同的时间维度里呈现不同的意义，让读者看见生命是如何在不知不觉中被塑造的。
+
+门罗是短篇小说形式的最大革新者之一——她让短篇承担了长篇才能承担的时间跨度和心理深度。她的故事通常覆盖一个人的几十年，用时间跳跃来制造意义：某件年轻时的事，多年后回头看，意思完全不同了；某个决定，当时看起来很小，后来才明白它改变了一切。
+
+你对「断裂的、在闪回与当下之间跳跃「的叙事倾向，和对「时间感「的敏感，与她的叙事策略是相通的。她特别擅长处理那种「记忆被重新理解「的时刻——一个已经是老人的人，忽然明白了自己几十年前的某件事，那种明白不是简单的领悟，而是对整个生命的重新排列。
+
+她写的几乎全是女性的生活——小镇、家庭、婚姻、出走、回归——但那些生活里包含了最普遍的人类经验：改变、失去、发现、接受。她让那些「不重要「的生活具有了文学的尊严，让那些「普通「的女人成为了完整的、复杂的文学主体。
+
+她说，平凡的生活里，有最复杂的心理地理。你的写作也在开掘这块心理地理，那种相信日常生活本身就足够丰富、足够复杂、足够值得认真对待的信念。`,
+ v:{fragmented:2,psychological:2,intimate:2,realism:2,subtext:2,detail:2,restraint:1}},
+{n:"麦卡勒斯",en:"Carson McCullers",era:"美国 · 20世纪",
+ q:`爱，是最奇特的旅程，没有归宿。`,
+ d:`你的写作有麦卡勒斯那种对孤独的深刻体认——她把孤独写成一种生理状态，一种器官的疾病，那种疾病不是需要治愈的，而是人类存在的基本条件，是我们每个人都活在其中的状态。她的《心是孤独的猎手》是关于一个小镇上几个彼此无法沟通的人，每个人都深深地爱着某个人，但那种爱无法被传递，无法被理解，只能在自己内部燃烧。
+
+麦卡勒斯是南方哥特式文学的代表人物，她笔下的世界是一个特殊的南方——炎热、压抑、充满暴力的可能性，但也充满了奇异的温柔。那种世界里的孤独特别真实，因为那里的人离得那么近，却永远无法真正相互进入。
+
+你对「爱恨交织、复杂但不试图解决「的写作关系，和对「微妙的、那些没有名字的轻微感受「的偏好，与她的叙事重心是相通的。她不相信情感可以被简单分类，她相信人心里住着各种相互矛盾的东西，那些矛盾不是需要被解决的问题，而是人之为人的基本状态。
+
+她写作时年纪很轻——《心是孤独的猎手》出版时她才二十三岁——但她写出了一种属于整个人类的古老的孤独，那种孤独在她的语言里有一种特殊的清晰，像一块被水冲光的石头。
+
+她说，爱，是最奇特的旅程，没有归宿。这个没有归宿不是悲观，而是对爱的本质的诚实认识：真正的爱不是达到某个终点，而是一种永远在途中的状态。`,
+ v:{psychological:2,intimate:2,atmosphere:2,social:1,confessional:2,subtext:1}},
+{n:"鲍勃·迪伦",en:"Bob Dylan",era:"美国 · 当代",
+ q:`一个人必须保持忙碌，以便不去想那些令他痛苦的事。`,
+ d:`你的写作有迪伦式的民谣诗学——他把口语和意象、政治批判和私密情感、圣经典故和街头俚语融合在一起，创造了一种无法归类的声音，那种声音既是时代的，也是永恒的，既是公共的，也是极度私人的。
+
+迪伦的歌词是真正的诗——不只是有韵脚的歌词，而是有密度、有多义性、有感知精度的诗。他的意象是压缩的：一行歌词里可以同时有字面意义、隐喻意义和历史意义，那种层次的密度是真正的诗歌密度。你对语言节奏的偏好，和对「意象驱动「写作的认同，与他的创作方式是相通的。
+
+他来自美国民谣传统，那个传统相信歌是用来说真话的——关于政治的真话，关于爱情的真话，关于那些普通人的苦难和希望的真话。他继承了这个传统，然后打破了它，让民谣变成了一种更复杂、更多义、更难以简单理解的东西。
+
+他的写作不在乎被理解——有时候他故意制造谜面，因为他相信谜面本身就是意义，被明确解读了的东西就失去了它的诗性力量。那种对「不被完全理解「的接受，是他最有意思的文学立场。
+
+他说，一个人必须保持忙碌，以便不去想那些令他痛苦的事。这句话里有他对人类如何面对痛苦的理解：创作，行动，不停地做事，这本身就是一种应对虚无的方式。你的写作也有这种把创作当作生存策略的意识。`,
+ v:{poetic:2,imagery:2,social:1,directness:1,confessional:1,rhythm:2}},
+{n:"娜塔莉·萨洛特",en:"Nathalie Sarraute",era:"法国 · 20世纪",
+ q:`语言是一道屏障，也是唯一的桥。`,
+ d:`你的写作有萨洛特式的微观心理质感——她追踪人与人之间最细微的情感流动，那些在话语产生之前、在言语表面之下的真实交换，她称之为「亚对话」：话说出来了，但那话背后的感受、恐惧、欲望和敌意，才是真正发生的东西。
+
+萨洛特是法国新小说派的重要成员，她对传统心理小说的反叛是深刻的：传统小说把心理写成可以被清晰命名的情绪，而她要捕捉的是那些在情绪被命名之前的状态，那些模糊的、多义的、几乎无法言说的内心运动。她的《对话集》和《金果》都是对这个「亚对话「层面的探索。
+
+你对「没有说出口的话「的高度敏感，和对「言外之意「的写作偏好，与她的叙事哲学是核心对应的。她相信，真正重要的沟通总是在语言的表面下进行的，那个表面下的沟通才是人与人之间最真实的接触，也是最痛苦的分离。
+
+她的语言有一种特殊的流动性——她的句子常常没有明确的主语，因为那个心理状态不属于任何一个确定的人，它是一种在人与人之间流动的东西，一种由情境本身产生的状态。
+
+她说，语言是一道屏障，也是唯一的桥。这个悖论是她整个写作的核心：我们用语言试图接触彼此，但语言本身总是在我们之间制造新的距离；我们说出的话，总是不完全是我们想说的话。你的写作也有这种对语言限度的清醒，和对那个限度之内的精确追求。`,
+ v:{psychological:3,subtext:3,experimental:2,minimalism:1,intimate:2,analytical:1}},
+{n:"赫尔曼·黑塞",en:"Stefan Zweig",era:"奥地利 · 20世纪",
+ q:`一个人最大的财富是他内心的平静。`,
+ d:`你的写作有茨威格式的心理传记感——他用短篇为历史人物写内心侧影，把一个决定性时刻的内心戏剧写得比战争还要激烈。那种对个体心理的精准聚焦，是他的独特贡献。`,
+ v:{psychological:3,intimate:2,realism:2,analytical:2,baroque:1}},
+];
+
+// Fix duplicate (remove duplicate entry)
+// Deduplicate by name
+const seenNames = new Set();
+const WRITERS = WR.filter(w => { if(seenNames.has(w.n)) return false; seenNames.add(w.n); return true; });
+
+// ── ANALYSIS ────────────────────────────────────────────────
+function analyzeWriting(text){
+  const t=text, len=t.replace(/\s/g,'').length||1;
+  const d={};
+  const avgSL=len/Math.max(1,(t.match(/[。！？.!?]/g)||[]).length);
+  if(avgSL<15)d.minimalism=(d.minimalism||0)+2;
+  if(avgSL>35)d.baroque=(d.baroque||0)+2;
+  const qmarks=(t.match(/[？?]/g)||[]).length;
+  if(qmarks>=2){d.philosophical=(d.philosophical||0)+2;}
+  const mWords=['像','仿佛','如同','好像','犹如','如'];
+  let mc=0; mWords.forEach(w=>{mc+=(t.match(new RegExp(w,'g'))||[]).length;});
+  if(mc/len>0.015){d.metaphor=(d.metaphor||0)+2;d.imagery=(d.imagery||0)+1;}
+  const bWords=['手','脚','身体','皮肤','气味','声音','光','温度','触','嗅','冷','热'];
+  let bc=0; bWords.forEach(w=>{bc+=(t.match(new RegExp(w,'g'))||[]).length;});
+  if(bc>=2)d.sensory=(d.sensory||0)+2;
+  const iWords=['我','我的'];
+  let ic=0; iWords.forEach(w=>{ic+=(t.split(w).length-1);});
+  if(ic/len>0.03)d.confessional=(d.confessional||0)+2;
+  const sWords=['社会','时代','历史','制度','政治','人民','阶级'];
+  let sc=0; sWords.forEach(w=>{sc+=(t.match(new RegExp(w,'g'))||[]).length;});
+  if(sc>=2)d.social=(d.social||0)+2;
+  const aWords=['存在','虚无','意义','本质','时间','死亡','命运','荒诞'];
+  let ac=0; aWords.forEach(w=>{ac+=(t.match(new RegExp(w,'g'))||[]).length;});
+  if(ac>=2){d.philosophical=(d.philosophical||0)+2;d.existential=(d.existential||0)+1;}
+  return d;
+}
+
+function buildUserVec(ans, wDelta){
+  const v={};
+  QS.forEach((q,i)=>{
+    const a=ans[i]; if(a===undefined)return;
+    if(q.type==='scale'){
+      const val=(a-1)/4;
+      (q.st||[]).forEach(t=>{v[t]=(v[t]||0)+val*2;});
+    } else {
+      const sc=q.s[a]||{};
+      Object.entries(sc).forEach(([k,vv])=>{v[k]=(v[k]||0)+vv;});
+    }
+  });
+  Object.entries(wDelta).forEach(([k,vv])=>{v[k]=(v[k]||0)+vv;});
+  return v;
+}
+
+function cosineSim(a,b){
+  const keys=new Set([...Object.keys(a),...Object.keys(b)]);
+  let dot=0,na=0,nb=0;
+  keys.forEach(k=>{const av=a[k]||0,bv=b[k]||0;dot+=av*bv;na+=av*av;nb+=bv*bv;});
+  if(!na||!nb)return 0;
+  return dot/(Math.sqrt(na)*Math.sqrt(nb));
+}
+
+function toPercent(raw){
+  return Math.round(60+Math.min(1,Math.max(0,raw))*32);
+}
+
+// ── STATE ───────────────────────────────────────────────────
+let cur=0, ANS={}, wText='';
+const TOTAL=QS.length;
+
+function startQuiz(){
+  document.getElementById('cover').style.display='none';
+  document.getElementById('quiz-header').style.display='flex';
+  document.getElementById('quiz-shell').style.display='block';
+  renderQ(0);
+}
+
+function renderQ(idx){
+  const cont=document.getElementById('questions-container');
+  cont.innerHTML='';
+  const q=QS[idx];
+  if(q.sT){
+    const sm=document.createElement('div');
+    sm.className='section-marker';
+    sm.innerHTML=`<div class="sec-num">0${q.sec}</div><div class="sec-info"><h2>${q.sT}</h2><p>${q.sD}</p></div>`;
+    cont.appendChild(sm);
+  }
+  const block=document.createElement('div');
+  block.className='question-block';
+  block.innerHTML=`<div class="q-num">Q${String(idx+1).padStart(2,'0')} / ${String(TOTAL).padStart(2,'0')}</div><div class="q-text">${q.t}</div>`;
+  if(q.type==='scale'){
+    const wrap=document.createElement('div'); wrap.className='scale-wrap';
+    wrap.innerHTML=`<div class="scale-labels"><span>${q.left}</span><span>${q.right}</span></div>`;
+    const opts=document.createElement('div'); opts.className='scale-options';
+    for(let i=1;i<=5;i++){
+      const btn=document.createElement('button');
+      btn.className='scale-btn'+(ANS[idx]===i?' selected':'');
+      btn.textContent=i;
+      btn.onclick=()=>{opts.querySelectorAll('.scale-btn').forEach(b=>b.classList.remove('selected'));btn.classList.add('selected');ANS[idx]=i;updateProg();updateNav();};
+      opts.appendChild(btn);
+    }
+    wrap.appendChild(opts); block.appendChild(wrap);
+  } else {
+    const grid=document.createElement('div'); grid.className='options-grid';
+    ['A','B','C','D'].forEach((k,i)=>{
+      if(!q.o[i])return;
+      const lbl=document.createElement('label');
+      lbl.className='option-label'+(ANS[idx]===i?' selected':'');
+      lbl.innerHTML=`<input type="radio" name="q${idx}"><span class="opt-key">${k}</span><span class="opt-text">${q.o[i]}</span>`;
+      lbl.onclick=()=>{grid.querySelectorAll('.option-label').forEach(l=>l.classList.remove('selected'));lbl.classList.add('selected');ANS[idx]=i;updateProg();updateNav();};
+      grid.appendChild(lbl);
+    });
+    block.appendChild(grid);
+  }
+  cont.appendChild(block);
+  setTimeout(()=>block.classList.add('visible'),50);
+  updateProg(); updateNav();
+}
+
+function updateProg(){
+  const n=Object.keys(ANS).length;
+  document.getElementById('progress-fill').style.width=(n/TOTAL*100)+'%';
+  document.getElementById('progress-text').textContent=`${n} / ${TOTAL}`;
+}
+function updateNav(){
+  document.getElementById('btn-prev').disabled=cur===0;
+  document.getElementById('btn-next').textContent=cur===TOTAL-1?'进入第二部分 →':'下一题 →';
+}
+function navigate(dir){
+  const nx=cur+dir;
+  if(nx<0||nx>TOTAL)return;
+  if(nx===TOTAL){showWriting();return;}
+  cur=nx; renderQ(cur); window.scrollTo({top:0,behavior:'smooth'});
+}
+function showWriting(){
+  document.getElementById('quiz-shell').style.display='none';
+  document.getElementById('writing-section').style.display='block';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function updateWordCount(){
+  const t=document.getElementById('writing-input').value;
+  const n=t.replace(/\s/g,'').length;
+  const c=document.getElementById('word-counter');
+  c.textContent=n+'字　·　建议 80 字以上以获得更准确的结果';
+  c.className='word-counter'+(n>=40?' ok':'');
+  document.getElementById('btn-analyze').disabled=n<40;
+  wText=t;
+}
+function doAnalyze(){
+  document.getElementById('writing-section').style.display='none';
+  const ls=document.getElementById('loading-screen');
+  ls.style.display='flex';
+  const spans=ls.querySelectorAll('.loading-steps span');
+  let si=0;
+  const iv=setInterval(()=>{spans.forEach(s=>s.classList.remove('active'));if(si<spans.length){spans[si].classList.add('active');si++;}},650);
+  setTimeout(()=>{
+    clearInterval(iv);
+    const wd=analyzeWriting(wText);
+    const uv=buildUserVec(ANS,wd);
+    const ranked=WRITERS.map(w=>({...w,sim:cosineSim(uv,w.v)})).sort((a,b)=>b.sim-a.sim);
+    ls.style.display='none';
+    showResult(ranked,uv);
+  },2800);
+}
+
+function showResult(ranked,uv){
+  document.getElementById('result-screen').style.display='block';
+  window.scrollTo({top:0,behavior:'smooth'});
+  const top=ranked[0];
+  const pct=toPercent(top.sim);
+  document.getElementById('r-name').innerHTML=`你是<em>${top.n}</em>式的写作者`;
+  document.getElementById('r-meta').textContent=`${top.en}　·　${top.era}`;
+  document.getElementById('sim-pct').textContent=pct+'%';
+  document.getElementById('r-desc').textContent=top.d;
+  document.getElementById('r-quote').textContent=`"${top.q}"　——${top.n}`;
+  setTimeout(()=>{document.getElementById('sim-bar').style.width=pct+'%';},200);
+
+  // Secondary
+  const seen=new Set([top.n]);
+  const sec=ranked.filter(w=>!seen.has(w.n)&&seen.add(w.n)).slice(0,4);
+  const grid=document.getElementById('matches-grid');
+  grid.innerHTML='';
+  sec.forEach(w=>{
+    const p=toPercent(w.sim);
+    const card=document.createElement('div'); card.className='match-card';
+    card.innerHTML=`<div class="match-name">${w.n}</div><div class="match-name-en">${w.en}</div><div class="match-era">${w.era}</div><div class="match-pct">${p}%</div><div class="match-trait">${topTraits(w.v)}</div>`;
+    grid.appendChild(card);
+  });
+
+  // Trait spectrum
+  const defs=[
+    {label:'克制 vs 外放',a:'restraint',b:'confessional'},
+    {label:'具体 vs 抽象',a:'imagery',b:'philosophical'},
+    {label:'内心 vs 社会',a:'intimate',b:'social'},
+    {label:'写实 vs 超现实',a:'realism',b:'surrealism'},
+    {label:'简洁 vs 繁复',a:'minimalism',b:'baroque'},
+    {label:'直白 vs 含蓄',a:'directness',b:'subtext'},
+  ];
+  const td=document.getElementById('traits-display'); td.innerHTML='';
+  defs.forEach(def=>{
+    const av=uv[def.a]||0, bv=uv[def.b]||0, total=av+bv||1;
+    const pLeft=Math.round((av/total)*100);
+    const did='dt-'+def.a;
+    const row=document.createElement('div'); row.className='trait-row';
+    row.innerHTML=`<div class="trait-name">${def.label}</div><div class="trait-right"><div class="trait-spectrum"><div class="trait-dot" id="${did}" style="left:50%"></div></div><div class="trait-ends"><span>${def.label.split(' vs ')[0]}</span><span>${def.label.split(' vs ')[1]}</span></div></div>`;
+    td.appendChild(row);
+    setTimeout(()=>{document.getElementById(did).style.left=(100-pLeft)+'%';},400);
+  });
+}
+
+const TRAIT_LABELS={imagery:'感官意象',minimalism:'极简风格',baroque:'繁复华丽',restraint:'克制内敛',irony:'反讽意识',psychological:'心理深度',social:'社会关怀',existential:'存在追问',experimental:'实验精神',poetic:'诗性语言',intimate:'私密温度',confessional:'坦诚剖白',surrealism:'超现实',realism:'写实质感',philosophical:'哲学气质',subtext:'言外之意',fragmented:'碎片叙事',atmosphere:'氛围营造',analytical:'分析距离',defamiliarization:'陌生化',detail:'细节敏感',directness:'直接有力',metaphor:'比喻驱动',sensory:'感知导向',playful:'游戏精神',rhythm:'节奏感'};
+function topTraits(v){
+  return Object.entries(v).sort((a,b)=>b[1]-a[1]).slice(0,2).map(([k])=>TRAIT_LABELS[k]||k).join(' · ');
+}
+
+function restartQuiz(){
+  cur=0; ANS={}; wText='';
+  document.getElementById('result-screen').style.display='none';
+  document.getElementById('writing-input').value='';
+  document.getElementById('word-counter').textContent='0 字　·　建议 80 字以上以获得更准确的结果';
+  document.getElementById('btn-analyze').disabled=true;
+  document.getElementById('quiz-header').style.display='none';
+  document.getElementById('cover').style.display='flex';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+</script>
+</body>
+</html>
